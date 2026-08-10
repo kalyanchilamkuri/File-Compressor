@@ -1,0 +1,14 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ThemeToggle from '../components/ThemeToggle';
+import { SITE } from '../config/site';
+---
+
+<BaseLayout>
+  <ThemeToggle slot="header-actions" client:load />
+
+  <section class="mx-auto flex max-w-5xl flex-col items-center gap-4 px-4 py-24 text-center">
+    <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">{SITE.name}</h1>
+    <p class="max-w-xl text-lg text-slate-600 dark:text-slate-400">{SITE.description}</p>
+  </section>
+</BaseLayout>
