@@ -1,3 +1,4 @@
+import { defineConfig } from 'eslint/config';
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import eslintPluginAstro from 'eslint-plugin-astro';
@@ -6,7 +7,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import globals from 'globals';
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: [
       'dist/**',
@@ -20,6 +21,8 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...eslintPluginAstro.configs.recommended,
+  // a11y rules for .astro templates; it also registers the `jsx-a11y` plugin used below.
+  ...eslintPluginAstro.configs['jsx-a11y-recommended'],
   {
     files: ['**/*.{ts,tsx}'],
     ...react.configs.flat.recommended,
@@ -38,6 +41,6 @@ export default tseslint.config(
   },
   {
     files: ['**/*.{ts,tsx}'],
-    ...jsxA11y.flatConfigs.recommended,
+    rules: jsxA11y.flatConfigs.recommended.rules,
   },
 );

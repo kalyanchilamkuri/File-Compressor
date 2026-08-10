@@ -35,6 +35,8 @@ Astro (static output) + React islands + TypeScript (strict), Tailwind CSS, Web W
 
 ## Commands
 
+Requires Node.js 22 (LTS) or 24+ � see `.nvmrc`. Odd-numbered releases such as Node 23 are not supported by the toolchain.
+
 All commands run from the project root:
 
 | Command                | Action                                            |
@@ -44,11 +46,12 @@ All commands run from the project root:
 | `npm run build`        | Type-check (`astro check`) and build to `./dist/` |
 | `npm run preview`      | Preview the production build locally              |
 | `npm run lint`         | Lint with ESLint                                  |
+| `npm run typecheck`    | Type-check with `astro check`                     |
 | `npm run format`       | Format with Prettier                              |
 | `npm run format:check` | Check formatting without writing                  |
 | `npm run test`         | Run unit tests (Vitest)                           |
 | `npm run test:watch`   | Run unit tests in watch mode                      |
-| `npm run test:e2e`     | Run end-to-end tests (Playwright)                 |
+| `npm run test:e2e`     | Build first; runs Playwright against `preview`    |
 
 Before running `test:e2e` for the first time, install browser binaries:
 
@@ -64,7 +67,7 @@ npx playwright install
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
 4. Cloudflare Pages automatically picks up `public/_headers` for response headers (CSP, caching) — no extra configuration needed.
-5. No environment variables or backend services are required; this is a fully static site.
+5. Set `NODE_VERSION=22` if Cloudflare does not pick up `.nvmrc`. No other environment variables or backend services are required; this is a fully static site.
 
 ## Privacy & security rules (non-negotiable)
 
