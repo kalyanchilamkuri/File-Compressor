@@ -11,7 +11,19 @@ const { title, description = SITE.description } = Astro.props;
 const pageTitle = title
   ? `${title} · ${SITE.name}`
   : `${SITE.name} — compress files privately in your browser`;
-const canonicalURL = new URL(Astro.url.pathname, SITE.url);
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? SITE.url);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any (runs in a modern web browser)',
+  browserRequirements: 'Requires JavaScript',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
 ---
 
 <!doctype html>
@@ -19,8 +31,8 @@ const canonicalURL = new URL(Astro.url.pathname, SITE.url);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
 
     <title>{pageTitle}</title>
@@ -28,23 +40,54 @@ const canonicalURL = new URL(Astro.url.pathname, SITE.url);
     <link rel="canonical" href={canonicalURL} />
 
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
-    <meta name="twitter:card" content="summary_large_image" />
+    <!-- Switch to summary_large_image once an og:image exists. -->
+    <meta name="twitter:card" content="summary" />
 
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#ffffff" />
 
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+    <!-- Runs before paint to avoid a theme flash. Its hash is added to the CSP at build time. -->
     <script is:inline>
       (function () {
-        const stored = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const isDark = stored ? stored === 'dark' : prefersDark;
-        document.documentElement.classList.toggle('dark', isDark);
+        const root = document.documentElement;
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const meta = document.querySelector('meta[name="theme-color"]');
+        function stored() {
+          try {
+            return localStorage.getItem('theme');
+          } catch {
+            return null;
+          }
+        }
+        function sync() {
+          meta.content = root.classList.contains('dark') ? '#020617' : '#ffffff';
+        }
+        function apply() {
+          const s = stored();
+          root.classList.toggle('dark', s ? s === 'dark' : mq.matches);
+        }
+        new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['class'] });
+        apply();
+        sync();
+        if (mq.addEventListener) {
+          mq.addEventListener('change', function () {
+            if (!stored()) apply();
+          });
+        }
       })();
     </script>
   </head>
-  <body class="flex min-h-screen flex-col">
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#main"
+      class="sr-only rounded-md bg-slate-900 px-3 py-2 text-white focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 dark:bg-white dark:text-slate-900"
+    >
+      Skip to content
+    </a>
     <header class="border-b border-slate-200 dark:border-slate-800">
       <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
         <a href="/" class="text-lg font-semibold tracking-tight">
@@ -54,13 +97,15 @@ const canonicalURL = new URL(Astro.url.pathname, SITE.url);
       </div>
     </header>
 
-    <main class="flex-1">
+    <main id="main" class="flex-1">
       <slot />
     </main>
 
     <footer class="border-t border-slate-200 dark:border-slate-800">
-      <div class="mx-auto max-w-5xl px-4 py-6 text-sm text-slate-500 dark:text-slate-400">
-        <p>🔒 Files never leave your device · Works offline</p>
+      <div class="mx-auto max-w-5xl px-4 py-6 text-sm text-slate-600 dark:text-slate-400">
+        <p>
+          <span aria-hidden="true">🔒</span> Files never leave your device
+        </p>
       </div>
     </footer>
   </body>

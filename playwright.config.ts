@@ -1,5 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// Dedicated port so e2e always runs against the production build, never a dev
+// server someone left running on Astro's default 4321.
+const PORT = 4329;
+const BASE_URL = `http://localhost:${PORT}`;
+
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -7,7 +12,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',
   use: {
-    baseURL: 'http://localhost:4321',
+    baseURL: BASE_URL,
     trace: 'on-first-retry',
   },
   projects: [
@@ -16,8 +21,8 @@ export default defineConfig({
     { name: 'webkit', use: { ...devices['Desktop Safari'] } },
   ],
   webServer: {
-    command: 'npm run preview',
-    url: 'http://localhost:4321',
+    command: `npm run preview -- --port ${PORT}`,
+    url: BASE_URL,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },
