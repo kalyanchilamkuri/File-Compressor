@@ -6,6 +6,9 @@
     "node": "^22.12.0 || >=24.0.0"
   },
   "scripts": {
+    "vendor": "node scripts/copy-vendor.mjs",
+    "predev": "npm run vendor",
+    "prebuild": "npm run vendor",
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
@@ -16,13 +19,34 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "gen:og": "node --experimental-strip-types scripts/make-og.mjs",
+    "gen:icons": "node scripts/make-icons.mjs",
+    "gen:fixtures": "node scripts/make-fixtures.mjs",
+    "serve:dist": "node scripts/serve-dist.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.0.0",
     "@astrojs/sitemap": "^3.7.4",
+    "@jsquash/avif": "^2.1.1",
+    "@jsquash/jpeg": "^1.6.0",
+    "@jsquash/oxipng": "^2.3.0",
+    "@jsquash/png": "^3.1.1",
+    "@jsquash/resize": "^2.1.1",
+    "@jsquash/webp": "^1.5.0",
+    "@mediabunny/aac-encoder": "^1.59.0",
+    "@mediabunny/mp3-encoder": "^1.59.0",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.4",
+    "comlink": "^4.4.2",
+    "fflate": "^0.8.3",
+    "heic-to": "^1.5.2",
+    "libarchive.js": "^2.0.2",
+    "libimagequant-wasm": "^0.3.0",
+    "mediabunny": "^1.59.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.3.289",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "tailwindcss": "^4.3.3"
@@ -40,6 +64,7 @@
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vite-pwa/astro": "^1.2.0",
     "@vitest/ui": "^5.0.1",
     "eslint": "^9.39.5",
     "eslint-plugin-astro": "^1.7.0",
@@ -53,6 +78,7 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.70.1",
+    "vite-plugin-pwa": "^1.3.0",
     "vitest": "^5.0.1"
   }
 }
