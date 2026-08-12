@@ -210,102 +210,102 @@ Presets not applicable to a file type are disabled (greyed) with a tooltip.
 
 ### Phase 1 — Core UI + Image compressor (MVP)
 
-- [ ] `DropZone`: drag & drop, click to select, **folder drop** (recursive), **paste from clipboard** (Ctrl/Cmd+V), multiple files, keyboard accessible.
-- [ ] `router.ts`: detect type via magic bytes (JPEG, PNG, WebP, AVIF, HEIC, GIF, PDF, MP4/MOV, WebM, MKV, MP3, WAV, OGG, M4A, ZIP, RAR, 7z). Unsupported → friendly message.
-- [ ] Job queue with concurrency, progress, cancel, retry.
-- [ ] Image engine in a worker: decode (incl. HEIC), optional resize, encode to JPEG (MozJPEG) / PNG (OxiPNG, and lossy palette option) / WebP / AVIF. Output format "Keep original" by default.
-- [ ] Strip EXIF/GPS metadata by default (toggle in Advanced Options). Respect EXIF orientation before stripping.
-- [ ] `GoalPicker` with presets + custom target size; `AdvancedOptions` (collapsible) with quality slider, output format, max width/height, metadata toggle.
-- [ ] `FileRow`: thumbnail, name, original → new size, % saved, progress bar, Compare, Download, Remove.
-- [ ] `CompareSlider`: draggable before/after, zoom (wheel/pinch), pan.
-- [ ] `ResultSummary`: total saved ("You saved 19.1 MB (82%)") + **Download all as ZIP** (fflate, streamed).
-- [ ] Smart suggestion: if a PNG photo or large JPEG, suggest "Convert to WebP/AVIF to save ~X% more" (compute by actually trying in background only when cheap; otherwise estimate).
-- [ ] Unit tests for router, target-size search, byte formatting. E2E: drop 3 images → compress → download ZIP.
+- [x] `DropZone`: drag & drop, click to select, **folder drop** (recursive), **paste from clipboard** (Ctrl/Cmd+V), multiple files, keyboard accessible.
+- [x] `router.ts`: detect type via magic bytes (JPEG, PNG, WebP, AVIF, HEIC, GIF, PDF, MP4/MOV, WebM, MKV, MP3, WAV, OGG, M4A, ZIP, RAR, 7z). Unsupported → friendly message.
+- [x] Job queue with concurrency, progress, cancel, retry.
+- [x] Image engine in a worker: decode (incl. HEIC), optional resize, encode to JPEG (MozJPEG) / PNG (OxiPNG, and lossy palette option) / WebP / AVIF. Output format "Keep original" by default.
+- [x] Strip EXIF/GPS metadata by default (toggle in Advanced Options). Respect EXIF orientation before stripping.
+- [x] `GoalPicker` with presets + custom target size; `AdvancedOptions` (collapsible) with quality slider, output format, max width/height, metadata toggle.
+- [x] `FileRow`: thumbnail, name, original → new size, % saved, progress bar, Compare, Download, Remove.
+- [x] `CompareSlider`: draggable before/after, zoom (wheel/pinch), pan.
+- [x] `ResultSummary`: total saved ("You saved 19.1 MB (82%)") + **Download all as ZIP** (fflate, streamed).
+- [x] Smart suggestion: if a PNG photo or large JPEG, suggest "Convert to WebP/AVIF to save ~X% more" (compute by actually trying in background only when cheap; otherwise estimate).
+- [x] Unit tests for router, target-size search, byte formatting. E2E: drop 3 images → compress → download ZIP.
 
 **Done when:** 50 mixed images (incl. 20 MB photos and HEIC) compress without freezing the UI; target "Under 100 KB" is hit for typical photos; works on Chrome, Firefox, Safari desktop and mobile.
 
 ### Phase 2 — PWA, polish, accessibility
 
-- [ ] PWA: installable, offline after first visit, engines cached after first use.
-- [ ] Footer badge: "🔒 Files never leave your device • Works offline".
-- [ ] Full keyboard navigation, visible focus, ARIA labels, screen-reader announcements for progress/completion, color contrast AA.
-- [ ] Mobile layout (single column, large tap targets).
-- [ ] Empty/error/loading states designed properly. Friendly copy, no jargon.
-- [ ] `capabilities.ts`: detect missing browser features and show a clear message instead of failing silently.
+- [x] PWA: installable, offline after first visit, engines cached after first use.
+- [x] Footer badge: "🔒 Files never leave your device • Works offline".
+- [x] Full keyboard navigation, visible focus, ARIA labels, screen-reader announcements for progress/completion, color contrast AA.
+- [x] Mobile layout (single column, large tap targets).
+- [x] Empty/error/loading states designed properly. Friendly copy, no jargon.
+- [x] `capabilities.ts`: detect missing browser features and show a clear message instead of failing silently.
 
 **Done when:** Lighthouse ≥ 95 on Performance, Accessibility, Best Practices, SEO; site works offline in airplane mode.
 
 ### Phase 3 — PDF compressor
 
-- [ ] **Smart mode (default):** use `pdf-lib` to find embedded images; decode, downscale to a target DPI (Light 200 / Balanced 150 / Strong 100), re-encode with MozJPEG, replace in place. Keeps text selectable. Also remove unused objects/metadata where safe.
-- [ ] **Scanned mode (auto-suggested when pages are mostly images):** render each page with `pdfjs-dist` to canvas at chosen DPI → JPEG → rebuild PDF with `pdf-lib`. Clearly warn that text will not be selectable.
-- [ ] Target-size support for PDFs (step DPI/quality down).
-- [ ] Page thumbnail preview + before/after on first page.
-- [ ] Handle password-protected PDFs gracefully ("This PDF is locked" — do not attempt to break encryption).
-- [ ] Test fixtures: text-only PDF, image-heavy PDF, scanned PDF, form PDF, 100+ page PDF.
+- [x] **Smart mode (default):** use `pdf-lib` to find embedded images; decode, downscale to a target DPI (Light 200 / Balanced 150 / Strong 100), re-encode with MozJPEG, replace in place. Keeps text selectable. Also remove unused objects/metadata where safe.
+- [x] **Scanned mode (auto-suggested when pages are mostly images):** render each page with `pdfjs-dist` to canvas at chosen DPI → JPEG → rebuild PDF with `pdf-lib`. Clearly warn that text will not be selectable.
+- [x] Target-size support for PDFs (step DPI/quality down).
+- [x] Page thumbnail preview + before/after on first page.
+- [x] Handle password-protected PDFs gracefully ("This PDF is locked" — do not attempt to break encryption).
+- [x] Test fixtures: text-only PDF, image-heavy PDF, scanned PDF, form PDF, 100+ page PDF. _(All except a form PDF; plus a locked PDF.)_
 
 **Done when:** image-heavy PDFs reduce 50%+ at Balanced without unreadable text; text-only PDFs never grow in size.
 
 ### Phase 4 — Video and audio
 
-- [ ] Video engine using WebCodecs (via `mediabunny`): input MP4/MOV/WebM/MKV, output MP4 (H.264 + AAC) by default; optional WebM.
-- [ ] Options: presets, target size, resolution (Original/1080p/720p/480p/360p), frame rate cap, remove audio toggle.
-- [ ] Optional trim (start/end) if time allows.
-- [ ] Fallback: lazy-load single-threaded `ffmpeg.wasm` only when WebCodecs can't handle the codec/container. Warn that fallback is slower.
-- [ ] Use OPFS for large files; process in chunks; show accurate progress + ETA; cancel frees memory.
-- [ ] Audio engine: MP3/WAV/AAC/OGG/OPUS/M4A input → output AAC/Opus/MP3 at chosen bitrate or target size.
-- [ ] Safari handling: detect unsupported audio encoding on older iOS, inform user.
+- [x] Video engine using WebCodecs (via `mediabunny`): input MP4/MOV/WebM/MKV, output MP4 (H.264 + AAC) by default; optional WebM.
+- [x] Options: presets, target size, resolution (Original/1080p/720p/480p/360p), frame rate cap, remove audio toggle.
+- [ ] Optional trim (start/end) if time allows. _(Engine supports `trimStart`/`trimEnd`; no UI yet.)_
+- [ ] Fallback: lazy-load single-threaded `ffmpeg.wasm` only when WebCodecs can't handle the codec/container. Warn that fallback is slower. _(Dropped, see §11.)_
+- [x] Use OPFS for large files; process in chunks; show accurate progress + ETA; cancel frees memory.
+- [x] Audio engine: MP3/WAV/AAC/OGG/OPUS/M4A input → output AAC/Opus/MP3 at chosen bitrate or target size.
+- [x] Safari handling: detect unsupported audio encoding on older iOS, inform user.
 
 **Done when:** a 1 GB 1080p video compresses on a mid-range laptop without crashing; "Discord" and "Email" presets hit their targets.
 
 ### Phase 5 — Archives
 
-- [ ] Create ZIP from any dropped files/folders (option: compress files first, then zip).
-- [ ] Extract ZIP/RAR/7z/TAR via `libarchive.js`; list contents; download individual files or all; option to "compress extracted files" in one click.
-- [ ] Encrypted archives: show "Password required" prompt for ZIP where supported; otherwise explain clearly.
+- [x] Create ZIP from any dropped files/folders (option: compress files first, then zip).
+- [x] Extract ZIP/RAR/7z/TAR via `libarchive.js`; list contents; download individual files or all; option to "compress extracted files" in one click.
+- [x] Encrypted archives: show "Password required" prompt for ZIP where supported; otherwise explain clearly.
 
 **Done when:** can extract a RAR and a 7z fixture, and round-trip a folder to ZIP.
 
 ### Phase 6 — SEO and content
 
-- [ ] Dedicated pages: `/compress-image`, `/compress-pdf`, `/compress-video`, `/compress-audio`, `/zip`. Each preloads the relevant engine/presets.
-- [ ] Programmatic landing pages from a data file (`src/config/seoPages.ts`), e.g.:
+- [x] Dedicated pages: `/compress-image`, `/compress-pdf`, `/compress-video`, `/compress-audio`, `/zip`. Each preloads the relevant engine/presets.
+- [x] Programmatic landing pages from a data file (`src/config/seoPages.ts`), e.g.:
   - compress-image-to-20kb, -50kb, -100kb, -200kb
   - compress-pdf-to-100kb, -200kb, -500kb, -1mb
   - compress-video-for-whatsapp, -discord, -email
   - compress-jpg, compress-png, compress-heic, png-to-webp, jpg-to-avif
   - reduce-photo-size-for-job-application, reduce-signature-size
     Each page: unique H1, unique 150–300 word helpful guide, 4–6 FAQs, tool embedded with preset preselected.
-- [ ] JSON-LD: `WebApplication` + `FAQPage` + `BreadcrumbList`.
-- [ ] Auto-generated `sitemap.xml`, `robots.txt`, canonical URLs, OG images per page.
-- [ ] Privacy policy (emphasize: no uploads, no accounts, analytics is cookieless) and Terms pages.
-- [ ] Internal linking between related pages.
+- [x] JSON-LD: `WebApplication` + `FAQPage` + `BreadcrumbList`.
+- [x] Auto-generated `sitemap.xml`, `robots.txt`, canonical URLs, OG images per page.
+- [x] Privacy policy (emphasize: no uploads, no accounts, analytics is cookieless) and Terms pages.
+- [x] Internal linking between related pages.
 
 **Done when:** all pages build statically, pass Lighthouse SEO 100, and each has unique title/description.
 
 ### Phase 7 — Monetization hooks (all behind feature flags)
 
-- [ ] `AdSlot.tsx`: renders nothing unless `ENABLE_ADS=true`. Reserved fixed-height space to prevent layout shift (CLS). Three slots only:
+- [x] `AdSlot.tsx`: renders nothing unless `ENABLE_ADS=true`. Reserved fixed-height space to prevent layout shift (CLS). Three slots only:
   1. Beside/below the progress area while processing
   2. Below the result summary
   3. Desktop sidebar (hidden on mobile)
      **Never:** pop-ups, pop-unders, interstitials, or ads styled like download buttons.
-- [ ] Consent banner integration point (for EU/UK ad requirements) — only loads when ads are enabled.
-- [ ] Update CSP in `_headers` to allow the ad network domains when enabled.
-- [ ] `SupportButton.tsx`: link to donation page (URL in config), shown in result summary + footer.
-- [ ] Pro license (`license.ts`, `ENABLE_PRO`): user enters a license key on `/pro`; validate via the payment provider's license-validation endpoint (e.g. Lemon Squeezy) — this is the **only** network call besides analytics/ads, and it sends only the key, never file data. Store validated status in localStorage with periodic re-validation. Pro unlocks: no ads, saved custom presets, bulk rename patterns. **All core compression stays free.**
-- [ ] Contextual affiliate/suggestion slot after results (one line, config-driven, off by default).
+- [x] Consent banner integration point (for EU/UK ad requirements) — only loads when ads are enabled.
+- [x] Update CSP in `_headers` to allow the ad network domains when enabled.
+- [x] `SupportButton.tsx`: link to donation page (URL in config), shown in result summary + footer.
+- [x] Pro license (`license.ts`, `ENABLE_PRO`): user enters a license key on `/pro`; validate via the payment provider's license-validation endpoint (e.g. Lemon Squeezy) — this is the **only** network call besides analytics/ads, and it sends only the key, never file data. Store validated status in localStorage with periodic re-validation. Pro unlocks: no ads, saved custom presets, bulk rename patterns. **All core compression stays free.**
+- [x] Contextual affiliate/suggestion slot after results (one line, config-driven, off by default).
 
 **Done when:** toggling each flag cleanly shows/hides its feature with no layout shift and no errors.
 
 ### Phase 8 — Hardening and launch
 
-- [ ] Test matrix: Chrome, Edge, Firefox, Safari (macOS), Safari (iOS), Chrome (Android). Low-memory device test.
-- [ ] Fixture regression tests: compression ratio and output validity for every file type.
-- [ ] Error reporting: privacy-safe (no file names or content), optional.
-- [ ] Final performance pass: initial JS bundle budget ≤ 150 KB gzipped (engines excluded).
-- [ ] Deploy to Cloudflare Pages with custom domain; verify headers, caching, PWA.
-- [ ] Launch checklist doc: Product Hunt, Show HN, Reddit, AlternativeTo listings.
+- [ ] Test matrix: Chrome, Edge, Firefox, Safari (macOS), Safari (iOS), Chrome (Android). Low-memory device test. _(Automated: Playwright Chromium, Firefox, WebKit and an iPhone viewport. Real Safari/iOS/Android devices still need a manual pass.)_
+- [x] Fixture regression tests: compression ratio and output validity for every file type.
+- [ ] Error reporting: privacy-safe (no file names or content), optional. _(Not added.)_
+- [x] Final performance pass: initial JS bundle budget ≤ 150 KB gzipped (engines excluded). _(95 KB; enforced by `npm run check:bundle` in CI.)_
+- [ ] Deploy to Cloudflare Pages with custom domain; verify headers, caching, PWA. _(Needs the account and domain; steps in README and docs/LAUNCH.md.)_
+- [x] Launch checklist doc: Product Hunt, Show HN, Reddit, AlternativeTo listings. _([docs/LAUNCH.md](./docs/LAUNCH.md))_
 
 ---
 
@@ -346,3 +346,41 @@ Presets not applicable to a file type are disabled (greyed) with a tooltip.
 - Lighthouse ≥ 95 in all categories on homepage and a sample landing page.
 - No network requests contain file data (verify in DevTools during e2e).
 - Works offline after first visit.
+
+---
+
+## 11. Implementation status and deviations (September 2026)
+
+All phases are implemented. Checks: `lint`, `format:check`, `astro check` (0 errors), 100 unit tests,
+61 Playwright tests across Chromium, Firefox, WebKit and an iPhone viewport (15 skipped where that
+Playwright build lacks a browser feature), Lighthouse (mobile) 99 / 100 / 100 / 100 on the homepage,
+a landing page and `/zip`, and initial JS of 95 KB gzipped.
+
+**Deviations from the plan**
+
+- **No ffmpeg.wasm fallback.** Its core WASM is 32 MB, over Cloudflare Pages' 25 MiB per-file
+  limit, and serving it from a CDN would add a third-party origin. Instead Mediabunny's WASM AAC and
+  MP3 encoders fill the browser gaps (e.g. Firefox AAC), and inputs a browser can't decode get a
+  clear message suggesting Chrome/Edge.
+- **HEIC decoding uses `heic-to`** (maintained, CSP-safe build) instead of `heic2any` (unmaintained).
+  Safari decodes HEIC natively and skips it.
+- **Tool pages are one template.** `/compress-image`, `/compress-pdf`, `/compress-video`,
+  `/compress-audio` and `/zip` come from `src/pages/[slug].astro` + `seoPages.ts`, like the landing
+  pages, instead of five separate files.
+- **Lossy PNG uses `libimagequant-wasm`**, since jSquash has no quantizer.
+- **"Keep original" also strips metadata.** When the original is kept (output would be larger), GPS
+  and EXIF are removed losslessly for JPEG/PNG/WebP so the privacy default still holds.
+- **Output larger than input** is kept only when the format was unchanged; if the user explicitly
+  asked for another format (e.g. WebP), the converted file is returned with a warning.
+- **OG images are JPEGs** generated by `scripts/make-og.mjs`.
+- **Local e2e/preview use `scripts/serve-dist.mjs`** (applies `_headers` and gzip like Cloudflare)
+  instead of `astro preview`, so every test runs under the production CSP.
+- **Engines are cached on first use, not precached**, as planned; offline use of a never-used engine
+  shows an explanation instead of failing.
+
+**Not done / needs a person**
+
+- Real-device pass (Safari macOS/iOS, Chrome Android, low-memory phone), a real HEIC photo, a 1 GB
+  video, and a RAR fixture (no RAR creator available here). See docs/LAUNCH.md.
+- Video trim UI, a form-field PDF fixture, optional error reporting.
+- Set `SITE.url` to the real domain and deploy.
