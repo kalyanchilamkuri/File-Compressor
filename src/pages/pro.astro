@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProLicense from '../components/ProLicense';
+import { FEATURE_FLAGS, SITE } from '../config/site';
+---
+
+<BaseLayout
+  title="Pro"
+  description={`${SITE.name} Pro: no ads, saved presets and rename patterns.`}
+  noindex={!FEATURE_FLAGS.ENABLE_PRO}
+>
+  <article class="prose-page mx-auto max-w-2xl px-4 py-12">
+    <h1>{SITE.name} Pro</h1>
+    {FEATURE_FLAGS.ENABLE_PRO ? (
+      <>
+        <p class="lead">
+          Every compression feature is free, forever. Pro is for people who use {SITE.name} every
+          day and want to support it.
+        </p>
+        <ul>
+          <li>No ads, anywhere.</li>
+          <li>Save your own presets and reuse them with one click.</li>
+          <li>
+            Rename patterns for downloads, like <code>{'{name}-web'}</code>.
+          </li>
+        </ul>
+        <div class="not-prose mt-8">
+          <ProLicense client:load />
+        </div>
+      </>
+    ) : (
+      <p class="lead">Pro isn’t available yet. Every feature of {SITE.name} is free to use.</p>
+    )}
+  </article>
+</BaseLayout>

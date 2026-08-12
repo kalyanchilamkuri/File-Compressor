@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" noindex>
+  <section class="mx-auto flex max-w-xl flex-col items-center gap-4 px-4 py-24 text-center">
+    <p class="text-sm font-semibold text-sky-700">404</p>
+    <h1 class="text-3xl font-bold tracking-tight">This page doesn’t exist</h1>
+    <p class="text-slate-600 dark:text-slate-400">
+      The link may be old or mistyped. The compressor is one click away.
+    </p>
+    <a href="/" class="rounded-full bg-sky-700 px-5 py-2.5 font-medium text-white hover:bg-sky-800">
+      Go to the compressor
+    </a>
+  </section>
+</BaseLayout>

@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Compressor from '../components/Compressor';
+import ZipTool from '../components/ZipTool';
+import { SEO_PAGES, pageBySlug, type SeoPage } from '../config/seoPages';
+import { SITE } from '../config/site';
+
+export function getStaticPaths() {
+  return SEO_PAGES.map((page) => ({ params: { slug: page.slug }, props: { page } }));
+}
+
+interface Props {
+  page: SeoPage;
+}
+
+const { page } = Astro.props;
+const site = Astro.site ?? new URL(SITE.url);
+const url = (slug: string) => new URL(`/${slug}`, site).href;
+const parent = page.parent ? pageBySlug(page.parent) : undefined;
+const related = page.related.map(pageBySlug).filter((p): p is SeoPage => !!p);
+
+const crumbs = [
+  { name: SITE.name, item: new URL('/', site).href },
+  ...(parent ? [{ name: parent.h1, item: url(parent.slug) }] : []),
+  { name: page.h1, item: url(page.slug) },
+];
+
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: page.faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: c.item,
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title={page.title}
+  description={page.description}
+  structuredData={structuredData}
+  ogImage={`/og/${page.slug}.jpg`}
+>
+  <section class="mx-auto flex max-w-3xl flex-col gap-8 px-4 pt-8 pb-12 sm:pt-12">
+    <nav aria-label="Breadcrumb" class="text-sm text-slate-500 dark:text-slate-400">
+      <ol class="flex flex-wrap items-center gap-1.5">
+        {crumbs.map((c, i) => (
+          <li class="flex items-center gap-1.5">
+            {i > 0 && <span aria-hidden="true">/</span>}
+            {i < crumbs.length - 1 ? (
+              <a href={new URL(c.item).pathname} class="hover:underline">
+                {c.name}
+              </a>
+            ) : (
+              <span aria-current="page">{c.name}</span>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+    <div class="text-center">
+      <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">{page.h1}</h1>
+      <p class="mx-auto mt-3 max-w-xl text-lg text-slate-600 dark:text-slate-400">{page.lead}</p>
+    </div>
+    {page.tool === 'zip' ? (
+      <ZipTool client:load />
+    ) : (
+      <Compressor client:load preset={page.preset} focus={page.focus} overrides={page.overrides} />
+    )}
+  </section>
+
+  <article class="mx-auto max-w-3xl px-4 pb-16">
+    <h2 class="text-2xl font-semibold tracking-tight">{page.guideTitle}</h2>
+    <div class="mt-4 space-y-4 leading-relaxed text-slate-700 dark:text-slate-300">
+      {page.guide.map((p) => (
+        <p>{p}</p>
+      ))}
+    </div>
+
+    <h2 class="mt-12 text-2xl font-semibold tracking-tight">Frequently asked questions</h2>
+    <div class="mt-4 divide-y divide-slate-200 rounded-2xl border border-slate-200 dark:divide-slate-800 dark:border-slate-800">
+      {page.faqs.map((f) => (
+        <details class="group px-5 py-4">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
+            {f.q}
+            <span aria-hidden="true" class="text-slate-400 transition group-open:rotate-45">
+              +
+            </span>
+          </summary>
+          <p class="mt-2 text-slate-700 dark:text-slate-300">{f.a}</p>
+        </details>
+      ))}
+    </div>
+
+    {related.length > 0 && (
+      <>
+        <h2 class="mt-12 text-2xl font-semibold tracking-tight">Related tools</h2>
+        <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+          {related.map((r) => (
+            <li>
+              <a
+                href={`/${r.slug}`}
+                class="block rounded-xl border border-slate-200 p-4 transition hover:border-sky-400 hover:bg-sky-50/50 dark:border-slate-800 dark:hover:border-sky-700 dark:hover:bg-sky-950/30"
+              >
+                <span class="font-medium">{r.h1}</span>
+                <span class="mt-1 block text-sm text-slate-600 dark:text-slate-400">{r.lead}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    )}
+  </article>
+</BaseLayout>

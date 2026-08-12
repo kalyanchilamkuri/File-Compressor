@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config/site';
+---
+
+<BaseLayout title="Terms of use" description={`The terms for using ${SITE.name}.`}>
+  <article class="prose-page mx-auto max-w-2xl px-4 py-12">
+    <h1>Terms of use</h1>
+    <p class="lead">{SITE.name} is a free tool. By using it you agree to these simple terms.</p>
+
+    <h2>Using the tool</h2>
+    <ul>
+      <li>You may use {SITE.name} for personal and commercial work, free of charge.</li>
+      <li>Only compress files you have the right to use and change.</li>
+      <li>Don’t try to disrupt the site or use it to break the law.</li>
+    </ul>
+
+    <h2>Your files</h2>
+    <p>
+      Files are processed on your device and never uploaded, so we don’t have a copy of them. Always
+      keep your originals: compression permanently removes some detail and may change how a file
+      looks or sounds.
+    </p>
+
+    <h2>No warranty</h2>
+    <p>
+      The tool is provided “as is”. We work hard to make it reliable, but we can’t guarantee that
+      every file will compress, reach a specific size, or be suitable for a particular purpose.
+      Check your results before relying on them.
+    </p>
+
+    <h2>Limitation of liability</h2>
+    <p>
+      To the extent the law allows, we are not liable for any loss arising from use of the tool,
+      including loss of data. Because your files never leave your device, keeping backups is up to
+      you.
+    </p>
+
+    <h2>Changes</h2>
+    <p>We may update these terms. The version on this page is the one that applies.</p>
+  </article>
+</BaseLayout>
