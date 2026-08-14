@@ -78,6 +78,9 @@ export async function openPdf(data: Uint8Array): Promise<OpenedPdf> {
     cMapUrl: `${VENDOR}cmaps/`,
     cMapPacked: true,
     wasmUrl: `${VENDOR}wasm/`,
+    // Must be explicit: pdf.js derives this default by reading document.baseURI, which throws a
+    // ReferenceError inside a Web Worker. True matches what it computes on the main thread.
+    useWorkerFetch: true,
     enableXfa: false,
     isOffscreenCanvasSupported: true,
     ...(inWorker ? { CanvasFactory: OffscreenCanvasFactory, FilterFactory: NoFilterFactory } : {}),

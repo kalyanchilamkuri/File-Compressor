@@ -67,8 +67,66 @@ export interface CompressResult {
   keptOriginal?: boolean;
 }
 
+/** Shared by the tools that build one PDF out of several inputs (merge, images → PDF). */
+export interface PdfBuildResult {
+  blob: Blob;
+  fileName: string;
+  pageCount: number;
+  /** Total bytes of all inputs. Deliberately not `originalBytes`: there is no single original. */
+  inputBytes: number;
+  outputBytes: number;
+  warnings: string[];
+}
+
+export interface MergeOptions {
+  stripMetadata: boolean;
+  /** Document title written into the merged PDF. */
+  title?: string;
+}
+
+export type MergeResult = PdfBuildResult;
+
+export interface ImagesToPdfOptions {
+  stripMetadata: boolean;
+  title?: string;
+  /** "fit" gives every page the image's own aspect ratio. */
+  pageSize: 'fit' | 'a4' | 'letter';
+  /** Page margin in points, ignored when pageSize is "fit". */
+  margin: number;
+  /** Quality (5-95) for images that have to be re-encoded as JPEG. */
+  quality: number;
+}
+
+export type ImagesToPdfResult = PdfBuildResult;
+
+export interface PdfToImagesOptions {
+  format: 'jpeg' | 'png';
+  dpi: number;
+  quality: number;
+}
+
+export interface PdfPageImage {
+  fileName: string;
+  blob: Blob;
+}
+
+export interface PdfToImagesResult {
+  pages: PdfPageImage[];
+  inputBytes: number;
+  outputBytes: number;
+  warnings: string[];
+}
+
 export type ProgressFn = (fraction: number) => void;
 
 export class UserFacingError extends Error {
   override name = 'UserFacingError';
 }
+
+/**
+ * Checks the name rather than using `instanceof`. Engines are lazily imported into their own
+ * chunks, and a chunk can end up with its own copy of the class, which makes `instanceof` quietly
+ * false and turns a clear message like "this PDF is locked" into "something went wrong".
+ */
+export const isUserFacing = (err: unknown): err is Error =>
+  err instanceof Error && err.name === 'UserFacingError';
