@@ -47,7 +47,8 @@ const api = {
       if (!navigator.onLine && isLoadFailure(err)) {
         return { ok: false, error: { userFacing: true, message: OFFLINE_ENGINE_MESSAGE } };
       }
-      const userFacing = err instanceof UserFacingError;
+      const userFacing =
+        err instanceof UserFacingError || (err instanceof Error && err.name === 'UserFacingError');
       if (!userFacing) console.error(err);
       return {
         ok: false,
