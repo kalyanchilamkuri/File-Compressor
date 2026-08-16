@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CompressibleEngine, PresetId, UserOverrides } from '../config/presets';
 import type { EngineId } from '../engine/types';
+import { convertedName, extensionOf } from '../lib/format';
 import { revalidateIfDue, usePro } from '../lib/license';
 import { applyPattern } from '../lib/rename';
 import AdSlot from './AdSlot';
@@ -9,6 +10,7 @@ import ArchivePanel, { archiveKey } from './ArchivePanel';
 import CompareSlider from './CompareSlider';
 import DropZone from './DropZone';
 import FileList from './FileList';
+import FormatPicker from './FormatPicker';
 import GoalPicker from './GoalPicker';
 import ProTools from './ProTools';
 import ResultSummary from './ResultSummary';
@@ -22,6 +24,11 @@ interface Props {
   focus?: EngineId;
   /** Preselected options, e.g. WebP output on the "PNG to WebP" page. */
   overrides?: Partial<UserOverrides>;
+  /**
+   * "convert" swaps the size-goal chips for a format picker and names outputs after the original
+   * ("photo.webp", not "photo-compressed.webp"). The engine is the same either way.
+   */
+  mode?: 'compress' | 'convert';
 }
 
 const ACCEPT: Partial<Record<EngineId, string>> = {
@@ -38,7 +45,8 @@ const HINT: Partial<Record<EngineId, string>> = {
   audio: 'MP3, WAV, M4A, AAC, OGG, Opus and FLAC.',
 };
 
-export default function Compressor({ preset, focus, overrides }: Props) {
+export default function Compressor({ preset, focus, overrides, mode = 'compress' }: Props) {
+  const converting = mode === 'convert';
   const c = useCompressor(preset, overrides);
   const [comparing, setComparing] = useState<Item | null>(null);
   const [archive, setArchive] = useState<File | null>(null);
@@ -59,11 +67,13 @@ export default function Compressor({ preset, focus, overrides }: Props) {
   const pattern = pro ? c.settings.renamePattern : undefined;
   const items = c.items;
   const nameFor = useCallback(
-    (item: Item) =>
-      pattern
-        ? applyPattern(pattern, item.file.name, item.result!.fileName, items.indexOf(item) + 1)
-        : item.result!.fileName,
-    [pattern, items],
+    (item: Item) => {
+      const produced = item.result!.fileName;
+      // The engine always appends "-compressed"; converting just wants the new extension.
+      const name = converting ? convertedName(item.file.name, extensionOf(produced)) : produced;
+      return pattern ? applyPattern(pattern, item.file.name, name, items.indexOf(item) + 1) : name;
+    },
+    [converting, pattern, items],
   );
   const processing = c.items.some((i) => i.status === 'processing');
 
@@ -76,7 +86,11 @@ export default function Compressor({ preset, focus, overrides }: Props) {
         compact={c.items.length > 0}
       />
 
-      <GoalPicker settings={c.settings} onChange={c.setSettings} engines={engines} />
+      {converting ? (
+        <FormatPicker settings={c.settings} onChange={c.setSettings} />
+      ) : (
+        <GoalPicker settings={c.settings} onChange={c.setSettings} engines={engines} />
+      )}
       <AdvancedOptions settings={c.settings} onChange={c.setSettings} engines={engines} />
       <ProTools settings={c.settings} onChange={c.setSettings} />
 
@@ -112,7 +126,12 @@ export default function Compressor({ preset, focus, overrides }: Props) {
         </div>
       )}
 
-      <ResultSummary items={c.items} onClear={c.clear} nameFor={nameFor} />
+      <ResultSummary
+        items={c.items}
+        onClear={c.clear}
+        nameFor={nameFor}
+        zipName={converting ? 'converted-files.zip' : undefined}
+      />
       {processing && <AdSlot slot="processing" />}
 
       <FileList

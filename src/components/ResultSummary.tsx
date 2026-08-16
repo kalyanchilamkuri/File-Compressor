@@ -12,6 +12,8 @@ interface Props {
   items: Item[];
   onClear: () => void;
   nameFor: (item: Item) => string;
+  /** Name for the "download all" archive. */
+  zipName?: string;
 }
 
 /** Keeps folder structure from folder drops: "trip/day1/a.jpg" → "trip/day1/a-compressed.jpg". */
@@ -20,7 +22,12 @@ export const zipPath = (item: Item, name: string) => {
   return `${slash >= 0 ? item.path.slice(0, slash + 1) : ''}${name}`;
 };
 
-export default function ResultSummary({ items, onClear, nameFor }: Props) {
+export default function ResultSummary({
+  items,
+  onClear,
+  nameFor,
+  zipName = 'compressed-files.zip',
+}: Props) {
   const [zipping, setZipping] = useState<number | null>(null);
   const abort = useRef<AbortController | null>(null);
   const done = items.filter((i) => i.status === 'done' && i.result);
@@ -61,7 +68,7 @@ export default function ResultSummary({ items, onClear, nameFor }: Props) {
         (p) => setZipping(p),
         abort.current.signal,
       );
-      downloadBlob(zip, 'compressed-files.zip');
+      downloadBlob(zip, zipName);
     } catch (err) {
       if (!(err instanceof DOMException && err.name === 'AbortError')) console.error(err);
     } finally {
