@@ -69,6 +69,22 @@ export function compressedName(original: string, ext?: string): string {
   return `${base}-compressed${finalExt ? `.${finalExt}` : ''}`;
 }
 
+/**
+ * "photo.large.JPG" + "webp" → "photo.large.webp". Converting is not compressing: the output is a
+ * different format of the same picture, so it keeps the name and only swaps the extension.
+ */
+export function convertedName(original: string, ext: string): string {
+  const dot = original.lastIndexOf('.');
+  const base = dot > 0 ? original.slice(0, dot) : original;
+  return ext ? `${base}.${ext}` : base;
+}
+
+/** The extension of a file name, without the dot. Empty when there isn't one. */
+export function extensionOf(name: string): string {
+  const dot = name.lastIndexOf('.');
+  return dot > 0 ? name.slice(dot + 1) : '';
+}
+
 /** Makes names unique within a ZIP: "a.jpg", "a.jpg" → "a.jpg", "a (2).jpg". */
 export function uniqueNames(names: readonly string[]): string[] {
   const seen = new Map<string, number>();
