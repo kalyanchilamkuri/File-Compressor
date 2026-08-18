@@ -28,6 +28,17 @@ test.describe('PDF', () => {
     expect(out.subarray(0, 5).toString('latin1')).toBe('%PDF-');
   });
 
+  test('Scanned mode rasterises pages in the worker', async ({ page }) => {
+    await open(page, '/compress-pdf');
+    await needsOffscreenCanvas(page);
+    await page.getByRole('button', { name: 'More options' }).click();
+    await page.getByLabel('Method').selectOption('scanned');
+    await addFiles(page, ['scanned.pdf']);
+    const r = await waitDone(page, 'scanned.pdf');
+    await expect(r).toContainText('no longer be selected');
+    expect(await outputBytes(page, 'scanned.pdf')).toBeLessThan(fixtureSize('scanned.pdf'));
+  });
+
   test('a locked PDF gets a clear message', async ({ page }) => {
     await open(page, '/compress-pdf');
     await needsOffscreenCanvas(page);
