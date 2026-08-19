@@ -1,4 +1,4 @@
-export const APP_NAME = 'Squish';
+export const APP_NAME = 'Shrinkly';
 
 export const SITE = {
   name: APP_NAME,

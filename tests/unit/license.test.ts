@@ -16,7 +16,7 @@ describe('validateLicense', () => {
     expect(url).toBe(MONETIZATION.license.validateUrl);
     expect(init.credentials).toBe('omit');
     expect(String(init.body)).toBe('license_key=KEY-123');
-    expect(JSON.parse(localStorage.getItem('squish:license:v1')!)).toMatchObject({
+    expect(JSON.parse(localStorage.getItem('shrinkly:license:v1')!)).toMatchObject({
       key: 'KEY-123',
       valid: true,
     });

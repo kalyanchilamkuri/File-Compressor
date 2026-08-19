@@ -17,7 +17,7 @@
 
 ## Listings
 
-- [ ] **Product Hunt**: title "Squish: compress any file, privately in your browser". First comment:
+- [ ] **Product Hunt**: title "Shrinkly: compress any file, privately in your browser". First comment:
       why it exists (privacy, no uploads, target sizes), what's unique (one drop zone for every
       type, before/after slider, offline). Prepare 4–5 screenshots and a 30-second screen recording.
 - [ ] **Show HN**: "Show HN: A private file compressor that runs entirely in the browser". Mention

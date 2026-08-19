@@ -1,4 +1,4 @@
-export const OPFS_TEMP_DIR = 'squish-tmp';
+export const OPFS_TEMP_DIR = 'shrinkly-tmp';
 
 async function tempDir(): Promise<FileSystemDirectoryHandle | null> {
   try {

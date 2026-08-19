@@ -3,7 +3,7 @@ import { usePro } from '../lib/license';
 import { DEFAULT_PATTERN } from '../lib/rename';
 import type { Settings } from './useCompressor';
 
-const KEY = 'squish:saved-presets:v1';
+const KEY = 'shrinkly:saved-presets:v1';
 
 interface Saved {
   name: string;

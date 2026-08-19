@@ -24,7 +24,7 @@ A free web app that compresses **images, PDFs, videos, audio, and archives** ent
 4. Unlimited batch + one-click ZIP download.
 5. Archive creation/extraction alongside media compression.
 
-**App name:** `[APP_NAME]` (placeholder — use this constant everywhere via a single config file so it's easy to change).
+**App name:** `Shrinkly` (configured centrally in `src/config/site.ts`).
 
 ---
 

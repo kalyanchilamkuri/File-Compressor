@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 
 export type Consent = 'granted' | 'denied';
-const KEY = 'squish:consent:v1';
+const KEY = 'shrinkly:consent:v1';
 const listeners = new Set<() => void>();
 
 export function getConsent(): Consent | null {

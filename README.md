@@ -1,4 +1,4 @@
-# Squish
+# Shrinkly
 
 A free web app that compresses images, PDFs, videos, audio, and archives entirely in your browser.
 

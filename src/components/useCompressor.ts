@@ -50,7 +50,7 @@ export interface Settings {
   renamePattern?: string;
 }
 
-const STORAGE_KEY = 'squish:settings:v1';
+const STORAGE_KEY = 'shrinkly:settings:v1';
 
 export const DEFAULT_SETTINGS: Settings = {
   presetId: DEFAULT_PRESET,

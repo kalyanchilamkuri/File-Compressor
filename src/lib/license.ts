@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { FEATURE_FLAGS, MONETIZATION } from '../config/site';
 
-const KEY = 'squish:license:v1';
+const KEY = 'shrinkly:license:v1';
 
 export interface LicenseState {
   key: string;
