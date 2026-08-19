@@ -272,6 +272,38 @@ export default function AdvancedOptions({
                 Remove sound
               </Check>
             </div>
+            <div className="grid grid-cols-2 gap-2 sm:col-span-2">
+              <Field label="Trim start (sec)" htmlFor={`${id}-ts`}>
+                <input
+                  id={`${id}-ts`}
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="0"
+                  className={numCls}
+                  value={o.trimStart ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value.trim();
+                    set({ trimStart: val === '' ? undefined : Math.max(0, Number(val)) });
+                  }}
+                />
+              </Field>
+              <Field label="Trim end (sec)" htmlFor={`${id}-te`}>
+                <input
+                  id={`${id}-te`}
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="End"
+                  className={numCls}
+                  value={o.trimEnd ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value.trim();
+                    set({ trimEnd: val === '' ? undefined : Math.max(0, Number(val)) });
+                  }}
+                />
+              </Field>
+            </div>
           </Section>
         )}
 

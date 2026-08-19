@@ -250,7 +250,7 @@ Presets not applicable to a file type are disabled (greyed) with a tooltip.
 
 - [x] Video engine using WebCodecs (via `mediabunny`): input MP4/MOV/WebM/MKV, output MP4 (H.264 + AAC) by default; optional WebM.
 - [x] Options: presets, target size, resolution (Original/1080p/720p/480p/360p), frame rate cap, remove audio toggle.
-- [ ] Optional trim (start/end) if time allows. _(Engine supports `trimStart`/`trimEnd`; no UI yet.)_
+- [x] Optional trim (start/end). _(Engine and Advanced Options UI supported.)_
 - [ ] Fallback: lazy-load single-threaded `ffmpeg.wasm` only when WebCodecs can't handle the codec/container. Warn that fallback is slower. _(Dropped, see §11.)_
 - [x] Use OPFS for large files; process in chunks; show accurate progress + ETA; cancel frees memory.
 - [x] Audio engine: MP3/WAV/AAC/OGG/OPUS/M4A input → output AAC/Opus/MP3 at chosen bitrate or target size.

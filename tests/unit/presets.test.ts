@@ -76,4 +76,14 @@ describe('presets', () => {
       false,
     );
   });
+
+  it('passes video trimStart and trimEnd overrides through', () => {
+    const o = resolveOptions('video', 'balanced', null, {
+      ...base,
+      trimStart: 5,
+      trimEnd: 25,
+    });
+    expect(o.trimStart).toBe(5);
+    expect(o.trimEnd).toBe(25);
+  });
 });

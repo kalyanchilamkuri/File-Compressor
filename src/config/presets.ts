@@ -158,6 +158,8 @@ export interface UserOverrides {
   videoFormat?: CompressOptions['videoFormat'];
   maxFrameRate?: number;
   removeAudio?: boolean;
+  trimStart?: number;
+  trimEnd?: number;
   audioFormat?: CompressOptions['audioFormat'];
   audioBitrate?: number;
 }
