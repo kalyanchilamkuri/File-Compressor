@@ -336,6 +336,8 @@ export default function AdvancedOptions({
                 <option value="96000">Good (96 kbps)</option>
                 <option value="128000">Great (128 kbps)</option>
                 <option value="192000">Excellent (192 kbps)</option>
+                <option value="256000">High fidelity (256 kbps)</option>
+                <option value="320000">Studio quality (320 kbps)</option>
               </select>
             </Field>
           </Section>

@@ -86,4 +86,12 @@ describe('presets', () => {
     expect(o.trimStart).toBe(5);
     expect(o.trimEnd).toBe(25);
   });
+
+  it('passes audioBitrate overrides through', () => {
+    const o = resolveOptions('audio', 'balanced', null, {
+      ...base,
+      audioBitrate: 320_000,
+    });
+    expect(o.audioBitrate).toBe(320_000);
+  });
 });
