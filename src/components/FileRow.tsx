@@ -176,7 +176,11 @@ function FileRow({ item, onRemove, onCancel, onRetry, onCompare, onOpenArchive, 
             </p>
           )}
           {r?.warnings.map((w) => (
-            <p key={w} className="mt-1 text-sm text-amber-700 dark:text-amber-400">
+            <p
+              key={w}
+              className="mt-1 flex items-start gap-1.5 text-sm text-amber-700 dark:text-amber-400"
+            >
+              <AlertIcon className="mt-0.5 h-4 w-4 shrink-0" />
               {w}
             </p>
           ))}
@@ -236,6 +240,7 @@ function FileRow({ item, onRemove, onCancel, onRetry, onCompare, onOpenArchive, 
             className="inline-flex items-center gap-1.5 rounded-full bg-sky-700 px-3.5 py-1.5 text-sm font-medium text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
             onClick={() => downloadBlob(r.blob, nameFor(item))}
             aria-label={`Download ${nameFor(item)}`}
+            title={`Download ${nameFor(item)} (${formatBytes(r.outputBytes)})`}
           >
             <DownloadIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Download</span>
