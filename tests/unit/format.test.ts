@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   compressedName,
+  convertedName,
+  extensionOf,
   formatBytes,
   formatDuration,
   parseSize,
@@ -53,6 +55,21 @@ describe('names', () => {
     expect(compressedName('photo.large.JPG', 'webp')).toBe('photo.large-compressed.webp');
     expect(compressedName('scan.pdf')).toBe('scan-compressed.pdf');
     expect(compressedName('README')).toBe('README-compressed');
+  });
+
+  it('converting keeps the name and only swaps the extension', () => {
+    expect(convertedName('photo.large.JPG', 'webp')).toBe('photo.large.webp');
+    expect(convertedName('IMG_0042.HEIC', 'jpg')).toBe('IMG_0042.jpg');
+    expect(convertedName('README', 'png')).toBe('README.png');
+    // A dotfile has no extension to replace, so the whole name is the stem.
+    expect(convertedName('.gitignore', 'txt')).toBe('.gitignore.txt');
+  });
+
+  it('reads the extension back off a produced name', () => {
+    expect(extensionOf('photo-compressed.webp')).toBe('webp');
+    expect(extensionOf('photo.large-compressed.jpg')).toBe('jpg');
+    expect(extensionOf('README')).toBe('');
+    expect(extensionOf('.gitignore')).toBe('');
   });
 
   it('makes ZIP entry names unique, case-insensitively', () => {
