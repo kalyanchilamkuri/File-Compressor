@@ -1,6 +1,11 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { PLACEHOLDER, inlineScriptHashes, injectHashes } from '../../integrations/csp-hashes.mjs';
+import {
+  PLACEHOLDER,
+  inlineScriptHashes,
+  injectExtraSources,
+  injectHashes,
+} from '../../integrations/csp-hashes.mjs';
 
 const sha = (s: string) => `'sha256-${createHash('sha256').update(s, 'utf8').digest('base64')}'`;
 
@@ -34,5 +39,22 @@ describe('injectHashes', () => {
 
   it('fails loudly if the placeholder is missing, rather than shipping a CSP that blocks hydration', () => {
     expect(() => injectHashes("script-src 'self'", ["'a'"])).toThrow(/not found/);
+  });
+});
+
+describe('injectExtraSources', () => {
+  const csp =
+    "script-src 'self' {{CSP_SCRIPT}}; connect-src 'self' {{CSP_CONNECT}}; frame-src 'self' {{CSP_FRAME}}";
+
+  it('adds flag-gated origins to the right directives', () => {
+    expect(
+      injectExtraSources(csp, { script: ['ads.example'], connect: ['api.example', 'api.example'] }),
+    ).toBe("script-src 'self' ads.example; connect-src 'self' api.example; frame-src 'self'");
+  });
+
+  it('removes the placeholders when every flag is off', () => {
+    expect(injectExtraSources(csp, {})).toBe(
+      "script-src 'self'; connect-src 'self'; frame-src 'self'",
+    );
   });
 });
