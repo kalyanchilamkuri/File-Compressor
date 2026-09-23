@@ -51,8 +51,28 @@ async function htmlFiles(dir) {
     .map((e) => join(e.parentPath, e.name));
 }
 
-/** @returns {import('astro').AstroIntegration} */
-export default function cspHashes() {
+/**
+ * Extra CSP sources for features behind flags (ads, Pro license checks). Each list replaces a
+ * `{{CSP_<NAME>}}` placeholder in `_headers`; an empty list removes the placeholder.
+ * @typedef {{ script?: string[]; connect?: string[]; frame?: string[]; img?: string[] }} ExtraSources
+ */
+
+/**
+ * @param {string} headers
+ * @param {ExtraSources} extra
+ */
+export function injectExtraSources(headers, extra) {
+  return headers.replace(/ ?\{\{CSP_(SCRIPT|CONNECT|FRAME|IMG)\}\}/g, (_, name) => {
+    const list = extra[/** @type {keyof ExtraSources} */ (name.toLowerCase())] ?? [];
+    return list.length ? ` ${[...new Set(list)].join(' ')}` : '';
+  });
+}
+
+/**
+ * @param {{ extra?: ExtraSources }} [options]
+ * @returns {import('astro').AstroIntegration}
+ */
+export default function cspHashes({ extra = {} } = {}) {
   return {
     name: 'csp-hashes',
     hooks: {
@@ -63,7 +83,8 @@ export default function cspHashes() {
           for (const h of inlineScriptHashes(await readFile(file, 'utf8'))) hashes.add(h);
         }
         const headersPath = join(outDir, '_headers');
-        await writeFile(headersPath, injectHashes(await readFile(headersPath, 'utf8'), hashes));
+        const headers = injectHashes(await readFile(headersPath, 'utf8'), hashes);
+        await writeFile(headersPath, injectExtraSources(headers, extra));
         logger.info(`Added ${hashes.size} inline script hash(es) to _headers CSP`);
       },
     },
