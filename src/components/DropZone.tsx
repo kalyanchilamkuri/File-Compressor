@@ -20,6 +20,7 @@ export default function DropZone({ onFiles, accept, compact = false, hint }: Pro
   const fileInput = useRef<HTMLInputElement>(null);
   const folderInput = useRef<HTMLInputElement>(null);
   const hintId = useId();
+  const fileInputId = useId();
 
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
@@ -78,19 +79,26 @@ export default function DropZone({ onFiles, accept, compact = false, hint }: Pro
           : 'border-slate-300 bg-slate-50/60 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-slate-600'
       }`}
     >
-      {!compact && (
-        <div className="rounded-full bg-sky-100 p-4 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300">
-          <UploadIcon className="h-8 w-8" />
+      {/* A real label, so clicking the arrow or the headline opens the picker with no JS and no
+          extra tab stop: keyboard users already have the "Choose files" button below. */}
+      <label
+        htmlFor={fileInputId}
+        className={`flex cursor-pointer flex-col items-center ${compact ? 'gap-2' : 'gap-4'}`}
+      >
+        {!compact && (
+          <div className="rounded-full bg-sky-100 p-4 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300">
+            <UploadIcon className="h-8 w-8" />
+          </div>
+        )}
+        <div>
+          <p className={`font-semibold ${compact ? 'text-base' : 'text-xl'}`}>
+            {dragging ? 'Drop to add' : 'Drop files or folders here'}
+          </p>
+          <p id={hintId} className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+            {hint ?? 'Images, PDFs, videos, audio and archives. Or paste with Ctrl+V.'}
+          </p>
         </div>
-      )}
-      <div>
-        <p className={`font-semibold ${compact ? 'text-base' : 'text-xl'}`}>
-          {dragging ? 'Drop to add' : 'Drop files or folders here'}
-        </p>
-        <p id={hintId} className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          {hint ?? 'Images, PDFs, videos, audio and archives. Or paste with Ctrl+V.'}
-        </p>
-      </div>
+      </label>
       <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           type="button"
@@ -111,6 +119,7 @@ export default function DropZone({ onFiles, accept, compact = false, hint }: Pro
       </div>
       <input
         ref={fileInput}
+        id={fileInputId}
         type="file"
         multiple
         accept={accept}

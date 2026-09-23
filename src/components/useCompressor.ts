@@ -11,7 +11,7 @@ import { AbortError, runInWorker } from '../engine/pool';
 import { JobQueue, defaultLaneLimit } from '../engine/queue';
 import { engineFor, sniffFile } from '../engine/router';
 import type { CompressOptions, CompressResult, DetectedType, EngineId } from '../engine/types';
-import { UserFacingError } from '../engine/types';
+import { isUserFacing } from '../engine/types';
 import { detectCapabilities, missingFor } from '../lib/capabilities';
 import type { PickedFile } from '../lib/files';
 import { clearTempFiles, deleteTempFile } from '../lib/opfs';
@@ -177,11 +177,10 @@ export function useCompressor(initialPreset?: PresetId, initialOverrides?: Parti
             );
           } catch (err) {
             if (err instanceof AbortError) return;
-            const message =
-              err instanceof UserFacingError
-                ? err.message
-                : 'Something went wrong with this file. You can try again.';
-            if (!(err instanceof UserFacingError)) console.error(err);
+            const message = isUserFacing(err)
+              ? err.message
+              : 'Something went wrong with this file. You can try again.';
+            if (!isUserFacing(err)) console.error(err);
             patch(item.id, { status: 'error', error: message });
             setAnnouncement(`${item.file.name} could not be compressed.`);
           }

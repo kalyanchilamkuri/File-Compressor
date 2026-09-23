@@ -16,8 +16,8 @@ interface Props {
 }
 
 async function pdfFirstPage(blob: Blob): Promise<Blob> {
-  const { firstPagePng } = await import('../engine/pdf/preview');
-  return firstPagePng(blob, 110);
+  const { pdfPreview } = await import('../engine/pdf/preview');
+  return (await pdfPreview(blob, 110)).png;
 }
 
 /** Browsers other than Safari can't show HEIC, so convert the "before" image for display only. */

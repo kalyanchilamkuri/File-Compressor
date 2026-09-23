@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo } from 'react';
 import { TYPE_LABEL } from '../engine/router';
 import { downloadBlob } from '../lib/download';
 import { formatBytes, formatDuration, percentSaved } from '../lib/format';
@@ -16,6 +16,7 @@ import {
 } from './icons';
 import type { Item } from './useCompressor';
 import { useObjectUrl } from './useObjectUrl';
+import { usePdfThumb } from './usePdfThumb';
 
 interface Props {
   item: Item;
@@ -29,27 +30,8 @@ interface Props {
 
 const BROWSER_VIEWABLE = new Set(['jpeg', 'png', 'webp', 'avif', 'gif', 'bmp']);
 
-/** First-page thumbnail for PDFs; pdf.js loads only once a PDF is added. */
-function usePdfThumb(item: Item) {
-  const [thumb, setThumb] = useState<{ file: File; blob: Blob } | null>(null);
-  useEffect(() => {
-    if (item.engine !== 'pdf') return;
-    let cancelled = false;
-    void import('../engine/pdf/preview')
-      .then(({ firstPagePng }) => firstPagePng(item.file, 18))
-      .then((blob) => !cancelled && setThumb({ file: item.file, blob }))
-      .catch(() => {
-        // Locked or damaged PDFs just keep the "PDF" badge.
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [item.engine, item.file]);
-  return thumb?.file === item.file ? thumb.blob : null;
-}
-
 function Thumb({ item }: { item: Item }) {
-  const pdfThumb = usePdfThumb(item);
+  const { thumb: pdfThumb } = usePdfThumb(item.engine === 'pdf' ? item.file : null);
   const source =
     item.engine === 'image'
       ? item.type && BROWSER_VIEWABLE.has(item.type)
