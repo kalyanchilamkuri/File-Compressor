@@ -4,7 +4,10 @@ test('homepage renders header, footer, and theme toggle', async ({ page }) => {
   await page.goto('/');
 
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.getByText('Files never leave your device')).toBeVisible();
+  await expect(
+    page.getByRole('contentinfo').getByText('Files never leave your device'),
+  ).toBeVisible();
+  await expect(page.getByTestId('dropzone')).toBeVisible();
 
   const toggle = page.getByRole('button', { name: /switch to (dark|light) theme/i });
   await expect(toggle).toBeVisible();
