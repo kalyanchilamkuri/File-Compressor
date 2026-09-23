@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Compressor from '../components/Compressor';
+import JpgToPdfTool from '../components/JpgToPdfTool';
+import MergePdfTool from '../components/MergePdfTool';
+import PdfToJpgTool from '../components/PdfToJpgTool';
 import ZipTool from '../components/ZipTool';
 import { SEO_PAGES, pageBySlug, type SeoPage } from '../config/seoPages';
 import { SITE } from '../config/site';
@@ -77,8 +80,20 @@ const structuredData = [
     </div>
     {page.tool === 'zip' ? (
       <ZipTool client:load />
+    ) : page.tool === 'merge-pdf' ? (
+      <MergePdfTool client:load />
+    ) : page.tool === 'pdf-to-jpg' ? (
+      <PdfToJpgTool client:load />
+    ) : page.tool === 'jpg-to-pdf' ? (
+      <JpgToPdfTool client:load />
     ) : (
-      <Compressor client:load preset={page.preset} focus={page.focus} overrides={page.overrides} />
+      <Compressor
+        client:load
+        mode={page.mode}
+        preset={page.preset}
+        focus={page.focus}
+        overrides={page.overrides}
+      />
     )}
   </section>
 
