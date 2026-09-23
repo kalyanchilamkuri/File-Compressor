@@ -8,6 +8,12 @@
       "port": 4321
     },
     {
+      "name": "dist-csp",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/serve-dist.mjs", "4333"],
+      "port": 4333
+    },
+    {
       "name": "preview",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "preview", "--", "--port", "4330"],

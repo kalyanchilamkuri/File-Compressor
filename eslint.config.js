@@ -16,7 +16,13 @@ export default defineConfig(
       'coverage/**',
       'playwright-report/**',
       'test-results/**',
+      'public/vendor/**',
     ],
+  },
+  {
+    // Node scripts; make-fixtures/make-og also contain code that runs in a Playwright page.
+    files: ['scripts/**/*.mjs', 'integrations/**/*.mjs', '*.config.{js,mjs,ts}'],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

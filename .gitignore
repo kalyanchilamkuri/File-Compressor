@@ -28,3 +28,6 @@ coverage/
 playwright-report/
 test-results/
 
+
+# copied from node_modules by scripts/copy-vendor.mjs
+public/vendor/
