@@ -14,7 +14,13 @@ export interface SeoPage {
   description: string;
   /** Short line under the H1. */
   lead: string;
-  tool: 'compressor' | 'zip';
+  tool: 'compressor' | 'zip' | 'merge-pdf' | 'pdf-to-jpg' | 'jpg-to-pdf';
+  /**
+   * "convert" puts a format picker above the fold and names outputs "photo.webp" rather than
+   * "photo-compressed.webp". Set explicitly rather than inferred from overrides.imageFormat, so a
+   * compression preset that happens to change format (Website) never turns a page into a converter.
+   */
+  mode?: 'compress' | 'convert';
   focus?: EngineId;
   preset?: PresetId;
   overrides?: Partial<UserOverrides>;
@@ -73,7 +79,7 @@ export const SEO_PAGES: SeoPage[] = [
       'compress-jpg',
       'compress-png',
       'compress-heic',
-      'png-to-webp',
+      'convert-image',
       'compress-image-to-100kb',
     ],
   },
@@ -111,12 +117,7 @@ export const SEO_PAGES: SeoPage[] = [
         a: 'No fixed limit. Very large documents simply take longer, and everything runs on your own device.',
       },
     ],
-    related: [
-      'compress-pdf-to-100kb',
-      'compress-pdf-to-200kb',
-      'compress-pdf-to-500kb',
-      'compress-pdf-to-1mb',
-    ],
+    related: ['compress-pdf-to-100kb', 'merge-pdf', 'pdf-to-jpg', 'compress-pdf-to-500kb'],
   },
   {
     slug: 'compress-video',
@@ -574,9 +575,10 @@ export const SEO_PAGES: SeoPage[] = [
       'Convert PNG images to WebP for faster websites, keeping transparency. Batch convert in your browser with no uploads and no limits.',
     lead: 'Much smaller images for the web, with transparency kept.',
     tool: 'compressor',
+    mode: 'convert',
     focus: 'image',
     overrides: { imageFormat: 'webp' },
-    parent: 'compress-image',
+    parent: 'convert-image',
     guideTitle: 'Why convert PNG to WebP',
     guide: [
       'WebP is supported by every modern browser and is usually far smaller than PNG: photos saved as PNG often shrink by 80–90%, and graphics by 25–50%. Transparency is fully supported, so logos and cut-out product shots work exactly as before.',
@@ -602,7 +604,7 @@ export const SEO_PAGES: SeoPage[] = [
         a: 'It uses high-quality lossy WebP by default, which gives the biggest savings with no visible change.',
       },
     ],
-    related: ['compress-png', 'jpg-to-avif', 'compress-image'],
+    related: ['webp-to-png', 'jpg-to-avif', 'convert-image'],
   },
   {
     slug: 'jpg-to-avif',
@@ -612,9 +614,10 @@ export const SEO_PAGES: SeoPage[] = [
       'Convert JPG photos to AVIF, the most efficient image format, in your browser. Often half the size of JPEG at the same quality. No uploads.',
     lead: 'The smallest possible photos for modern websites.',
     tool: 'compressor',
+    mode: 'convert',
     focus: 'image',
     overrides: { imageFormat: 'avif' },
-    parent: 'compress-image',
+    parent: 'convert-image',
     guideTitle: 'When AVIF makes sense',
     guide: [
       'AVIF is based on the AV1 video codec and is the most efficient image format browsers support today. At the same visual quality, an AVIF file is often around half the size of a JPEG, which makes a real difference on image-heavy websites and for visitors on mobile data.',
@@ -640,7 +643,395 @@ export const SEO_PAGES: SeoPage[] = [
         a: 'Yes. AVIF supports transparent images, like PNG and WebP.',
       },
     ],
-    related: ['png-to-webp', 'compress-jpg', 'compress-image'],
+    related: ['png-to-webp', 'webp-to-jpg', 'convert-image'],
+  },
+
+  // ---------- Convert pages ----------
+  {
+    slug: 'convert-image',
+    title: 'Convert images online — JPG, PNG, WebP, AVIF, HEIC',
+    h1: 'Convert images',
+    description:
+      'Change an image from one format to another in your browser: JPG, PNG, WebP, AVIF and HEIC in, JPG, PNG, WebP or AVIF out. No uploads, no signup.',
+    lead: 'Pick the format you need and convert whole folders at once.',
+    tool: 'compressor',
+    mode: 'convert',
+    focus: 'image',
+    overrides: { imageFormat: 'jpeg' },
+    guideTitle: 'Which format should you pick?',
+    guide: [
+      'Choose JPG when something has to open everywhere — forms, printers, older software, email attachments. Choose PNG when you need exact pixels or transparency, such as logos, screenshots and diagrams. Choose WebP for websites: it is roughly 25–35% smaller than JPG at the same quality and keeps transparency. Choose AVIF when you want the very smallest file and can accept slower conversion.',
+      'Your file is read on your own device, decoded to raw pixels, and written out again in the format you picked. HEIC photos from an iPhone, AVIF images from a website, WebP downloads and old BMP files can all be read, even when the operating system refuses to open them.',
+      'Output can be written as JPG, PNG, WebP or AVIF. There is no GIF, HEIC, ICO or SVG writer here, so those cannot be produced — and animated GIFs cannot be read either.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'Can I convert a whole folder at once?',
+        a: 'Yes. Drop a folder, or use the Folder button. Every image is converted and you can download the lot as one ZIP.',
+      },
+      {
+        q: 'Will converting lose quality?',
+        a: 'Converting to PNG is lossless. Converting to JPG, WebP or AVIF re-encodes the picture, which is why the quality slider exists under More options. At the default setting the change is not visible on screen.',
+      },
+      {
+        q: 'Can it convert to GIF, HEIC or SVG?',
+        a: 'No. Those formats have no writer in this tool, so it will not pretend to offer them. SVG in particular is a drawing format, not a photo format — a converted photo would just be the same photo in a bigger wrapper.',
+      },
+      {
+        q: 'Does converting also make the file smaller?',
+        a: 'Usually, yes — especially JPG or PNG to WebP or AVIF. Going to PNG normally makes photos larger, because PNG is lossless.',
+      },
+    ],
+    related: ['heic-to-jpg', 'webp-to-jpg', 'png-to-webp', 'compress-image'],
+  },
+  {
+    slug: 'heic-to-jpg',
+    title: 'Convert HEIC to JPG online — free iPhone photo converter',
+    h1: 'Convert HEIC to JPG',
+    description:
+      'Turn iPhone HEIC photos into JPG files that open on any computer. Batch convert in your browser — the photos are never uploaded anywhere.',
+    lead: 'Open your iPhone photos anywhere, without installing anything.',
+    tool: 'compressor',
+    mode: 'convert',
+    focus: 'image',
+    overrides: { imageFormat: 'jpeg' },
+    parent: 'convert-image',
+    guideTitle: 'Why iPhone photos won’t open',
+    guide: [
+      'Since iOS 11, iPhones save photos as HEIC. It is an excellent format — about half the size of JPEG for the same picture — but Windows, older Macs, most web forms and plenty of desktop software still refuse to open it. Converting to JPG solves that in one step.',
+      'Drop the .heic files here and they are decoded on your own device and written out as JPG. Your photos are personal, so it matters that nothing is uploaded: there is no server copy to worry about and nothing to delete afterwards.',
+      'JPG files are bigger than HEIC, so expect a converted photo to roughly double in size. If you need to stay under an upload limit as well, use the quality slider under More options, or go to the Compress images page and pick a target size.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'Can I convert many HEIC photos at once?',
+        a: 'Yes. Add as many as you like, or drop a whole folder, then download them all as a ZIP.',
+      },
+      {
+        q: 'Why are the JPG files bigger than the HEIC ones?',
+        a: 'HEIC is a newer, far more efficient format. The same photo as JPG is typically about twice the size. That is the cost of a file that opens everywhere.',
+      },
+      {
+        q: 'Are Live Photos supported?',
+        a: 'The still image is converted. The short video attached to a Live Photo is not part of the HEIC file and is not included.',
+      },
+      {
+        q: 'Will the photo be rotated correctly?',
+        a: 'Yes. The orientation recorded by the camera is applied to the pixels, so the JPG is upright in every app.',
+      },
+    ],
+    related: ['convert-image', 'compress-heic', 'png-to-jpg'],
+  },
+  {
+    slug: 'webp-to-jpg',
+    title: 'Convert WebP to JPG online — free and private',
+    h1: 'Convert WebP to JPG',
+    description:
+      'Turn WebP images downloaded from the web into JPG files that every app and upload form accepts. Batch convert in your browser, no uploads.',
+    lead: 'Make a downloaded WebP usable in forms, documents and older apps.',
+    tool: 'compressor',
+    mode: 'convert',
+    focus: 'image',
+    overrides: { imageFormat: 'jpeg' },
+    parent: 'convert-image',
+    guideTitle: 'Why you keep getting WebP files',
+    guide: [
+      'Most websites now serve images as WebP because it is smaller and loads faster. When you save one, you get a .webp file — and then a form, a printer, a word processor or a photo frame refuses it. JPG is the format everything understands, so converting is usually the quickest fix.',
+      'Drop the WebP files here and they are decoded and re-saved as JPG on your own device. The quality slider under More options controls how hard the JPEG encoder works; the default leaves no visible difference.',
+      'If the WebP had transparent areas, they are filled with white, because JPEG has no transparency at all. When that matters — a logo, a cut-out product shot — convert to PNG instead.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'What happens to transparency?',
+        a: 'JPEG cannot store transparency, so transparent areas become white and you get a warning saying so. Use WebP to PNG if you need to keep them.',
+      },
+      {
+        q: 'Will the JPG be bigger than the WebP?',
+        a: 'Often slightly, since WebP is the more efficient format. The difference is usually small at normal quality settings.',
+      },
+      {
+        q: 'Can I convert animated WebP files?',
+        a: 'No. Only still images are supported. An animated WebP has no single frame to convert.',
+      },
+      {
+        q: 'Is there a limit on how many I can convert?',
+        a: 'No. There is no file count limit, no size limit and no daily cap, because the work happens on your own computer.',
+      },
+    ],
+    related: ['webp-to-png', 'convert-image', 'png-to-jpg'],
+  },
+  {
+    slug: 'webp-to-png',
+    title: 'Convert WebP to PNG online — keeps transparency, free',
+    h1: 'Convert WebP to PNG',
+    description:
+      'Convert WebP images to PNG with transparency intact, right in your browser. Lossless output, batch conversion, no uploads and no signup.',
+    lead: 'Lossless PNG output, with transparent areas kept exactly as they are.',
+    tool: 'compressor',
+    mode: 'convert',
+    focus: 'image',
+    overrides: { imageFormat: 'png' },
+    parent: 'convert-image',
+    guideTitle: 'When PNG is the right target',
+    guide: [
+      'Pick PNG over JPG when the image has transparency, or when you need the pixels reproduced exactly: logos, icons, screenshots, diagrams, anything with sharp edges or text. PNG is lossless, so nothing is thrown away and the image can be edited and re-saved without degrading.',
+      'Because PNG is lossless, the quality slider has no effect here, and a photograph saved as PNG is usually several times larger than the WebP it came from. That is expected, not a bug — you are trading size for exactness.',
+      'If the result is too large and the image is a screenshot, a logo or a diagram, switch on “Shrink PNGs further by using fewer colours” under More options. It reduces the image to a 256-colour palette, which often cuts the size by more than half with no visible change on that kind of picture.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'Is transparency kept?',
+        a: 'Yes, completely. PNG stores a full alpha channel, so transparent and semi-transparent areas come through unchanged.',
+      },
+      {
+        q: 'Why is the PNG so much bigger than the WebP?',
+        a: 'PNG never discards detail, while WebP normally uses lossy compression. For photographs a PNG can easily be three to five times larger.',
+      },
+      {
+        q: 'Does the quality slider do anything?',
+        a: 'Not for PNG output — lossless means there is no quality to trade. The palette option under More options is the way to make a PNG smaller.',
+      },
+      {
+        q: 'Can I convert back to WebP later?',
+        a: 'Yes, on the PNG to WebP page. Note that going WebP to PNG and back does not recover detail the first lossy encode removed.',
+      },
+    ],
+    related: ['webp-to-jpg', 'png-to-webp', 'convert-image'],
+  },
+  {
+    slug: 'png-to-jpg',
+    title: 'Convert PNG to JPG online — free, private, batch',
+    h1: 'Convert PNG to JPG',
+    description:
+      'Convert PNG images to JPG in your browser for much smaller files and universal compatibility. Batch convert folders, nothing is uploaded.',
+    lead: 'Far smaller files for photos and screenshots you only need to share.',
+    tool: 'compressor',
+    mode: 'convert',
+    focus: 'image',
+    overrides: { imageFormat: 'jpeg' },
+    parent: 'convert-image',
+    guideTitle: 'What changes when you go PNG to JPG',
+    guide: [
+      'PNG stores every pixel exactly, which is perfect for editing and terrible for sharing photographs: a PNG photo is commonly five to ten times larger than the same picture as JPG. If the image is a photo or a screenshot you just need to send, upload or attach, JPG is almost always the better choice.',
+      'The conversion happens on your own device. Transparent areas are filled with white, because JPEG has no transparency — the tool tells you when that has happened, so you are never surprised by a black or white box where a cut-out used to be.',
+      'Keep your PNG as the master if you will edit the image again. JPEG is lossy, and re-saving a JPEG over and over slowly degrades it.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'What happens to transparent areas?',
+        a: 'They are filled with white. JPEG has no transparency channel, so there is nowhere to store them. Convert to WebP instead if you need to keep them.',
+      },
+      {
+        q: 'How much smaller will the JPG be?',
+        a: 'For photographs, usually 80–90% smaller. For flat graphics and logos the saving is much smaller, and PNG may even win.',
+      },
+      {
+        q: 'Will I lose quality?',
+        a: 'JPEG is lossy, so technically yes. At the default quality the difference is not visible on screen. Lower the quality slider only if you need a much smaller file.',
+      },
+      {
+        q: 'Should I convert screenshots to JPG?',
+        a: 'Usually not. Text and sharp lines get fuzzy edges in JPEG. Keep screenshots as PNG, or use WebP for a smaller lossless-looking result.',
+      },
+    ],
+    related: ['jpg-to-png', 'convert-image', 'compress-png'],
+  },
+  {
+    slug: 'jpg-to-png',
+    title: 'Convert JPG to PNG online — lossless output, free',
+    h1: 'Convert JPG to PNG',
+    description:
+      'Convert JPG photos to PNG in your browser when a tool or form insists on PNG. Lossless, batch, no uploads and no watermark.',
+    lead: 'For the times something only accepts PNG.',
+    tool: 'compressor',
+    mode: 'convert',
+    focus: 'image',
+    overrides: { imageFormat: 'png' },
+    parent: 'convert-image',
+    guideTitle: 'An honest note about JPG to PNG',
+    guide: [
+      'This conversion does not improve your image, and it is worth saying so plainly. Detail that JPEG compression removed is gone for good; wrapping the result in PNG stores those same pixels exactly, including any JPEG artefacts, in a file that is typically three to five times larger. It does not add transparency either — a JPEG has none to recover.',
+      'There is one good reason to do it, and it is a common one: some editor, print service, game asset pipeline, sticker maker or upload form simply refuses anything but PNG. That is what this page is for. Drop the JPGs and you get PNGs out, with nothing uploaded anywhere.',
+      'If your goal is a smaller file rather than a particular extension, use Compress JPG instead. If you want a lossless-looking image that is actually small, convert to WebP.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'Does converting to PNG improve the image?',
+        a: 'No. PNG stores the pixels the JPEG already had, artefacts and all. It prevents further loss from here on, but it cannot undo past loss.',
+      },
+      {
+        q: 'Will the PNG have transparency?',
+        a: 'No. A JPEG has no transparency to carry over. You would need an image editor to cut out a background.',
+      },
+      {
+        q: 'Why is the PNG so much larger?',
+        a: 'PNG is lossless. For a photograph that usually means three to five times the size of the JPG it came from.',
+      },
+      {
+        q: 'Can I make the PNG smaller?',
+        a: 'Yes — switch on the fewer-colours option under More options. It works very well for graphics and screenshots, less well for photographs.',
+      },
+    ],
+    related: ['png-to-jpg', 'png-to-webp', 'convert-image'],
+  },
+  {
+    slug: 'avif-to-jpg',
+    title: 'Convert AVIF to JPG online — free, private, no signup',
+    h1: 'Convert AVIF to JPG',
+    description:
+      'Open AVIF images anywhere by converting them to JPG in your browser. Batch conversion, nothing uploaded, no account needed.',
+    lead: 'Make a modern AVIF download work in older apps and forms.',
+    tool: 'compressor',
+    mode: 'convert',
+    focus: 'image',
+    overrides: { imageFormat: 'jpeg' },
+    parent: 'convert-image',
+    guideTitle: 'AVIF is new, and not everything reads it',
+    guide: [
+      'AVIF is the newest mainstream image format and the most efficient one browsers support. Websites are adopting it quickly, which means more and more saved images land on your disk as .avif — and then a document editor, an upload form or an older phone cannot open them.',
+      'Converting to JPG fixes that. The AVIF is decoded on your own device and written out as a JPEG that anything from the last thirty years can read. Expect the JPG to be noticeably larger: that size difference is exactly why websites moved to AVIF.',
+      'If you only need the image on the web, consider WebP instead. It is much better supported than AVIF, still far smaller than JPEG, and keeps transparency.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'Why can’t my computer open AVIF files?',
+        a: 'Support outside the browser is still patchy. Older versions of Windows, macOS and many desktop apps have no AVIF decoder yet.',
+      },
+      {
+        q: 'How much bigger will the JPG be?',
+        a: 'Often roughly twice the size, sometimes more. AVIF is very efficient, so the same picture needs more bytes as JPEG.',
+      },
+      {
+        q: 'Does the AVIF keep its transparency?',
+        a: 'Not in a JPG — JPEG has no transparency, so transparent areas are filled with white. Convert to PNG or WebP to keep them.',
+      },
+      {
+        q: 'Can I convert AVIF to PNG instead?',
+        a: 'Yes. Pick PNG in the format picker above, and the transparency is preserved.',
+      },
+    ],
+    related: ['convert-image', 'jpg-to-avif', 'webp-to-jpg'],
+  },
+
+  // ---------- PDF tools ----------
+  {
+    slug: 'merge-pdf',
+    title: 'Merge PDF files online — free, private, no signup',
+    h1: 'Merge PDF files',
+    description:
+      'Combine several PDFs into one document in your browser. Reorder them before merging, keep text selectable, and never upload a thing.',
+    lead: 'Join PDFs into one file, in the order you choose.',
+    tool: 'merge-pdf',
+    focus: 'pdf',
+    guideTitle: 'How merging works here',
+    guide: [
+      'Every page of every PDF you add is copied into a new document, in the order shown in the list. Nothing is re-rendered and nothing is re-compressed, so text stays selectable and searchable, links keep working, and the quality is identical to the originals. The merged file is roughly the size of its parts added together.',
+      'Order matters, and the tool never guesses. Dropped folders arrive in whatever order your operating system hands them over, which is often not alphabetical, so there is a Sort A→Z button and up and down arrows on every row. The first page of each PDF is shown as a thumbnail with its page count, so you can check you have the right file before merging.',
+      'If one of your files is locked with a password or is damaged, the merge stops and names that file. It will not quietly hand you a document with a chapter missing.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'Is there a limit on how many PDFs I can merge?',
+        a: 'No. There is no file count limit, no page limit and no daily cap. Very large documents simply take a little longer, and the work happens on your own device.',
+      },
+      {
+        q: 'Will the text stay selectable?',
+        a: 'Yes. Pages are copied across as they are, so text, links and fonts all survive. Nothing is turned into an image.',
+      },
+      {
+        q: 'Can I merge a password-protected PDF?',
+        a: 'No. A locked PDF cannot be read without its password, and this tool never tries to break encryption. Remove the password in your PDF reader first, then merge.',
+      },
+      {
+        q: 'How do I change the order?',
+        a: 'Use the up and down arrows on each row, or Sort A→Z to put them in name order. The merged document always follows the list exactly.',
+      },
+      {
+        q: 'The merged file is large. Can I shrink it?',
+        a: 'Yes — take the merged PDF over to the Compress PDF page. Merging deliberately does not re-compress anything, so that stays a separate, explicit step.',
+      },
+    ],
+    related: ['compress-pdf', 'jpg-to-pdf', 'pdf-to-jpg'],
+  },
+  {
+    slug: 'pdf-to-jpg',
+    title: 'Convert PDF to JPG online — every page as an image, free',
+    h1: 'Convert PDF to JPG',
+    description:
+      'Turn every page of a PDF into a JPG or PNG image, right in your browser. Pick the resolution, then download one page or all of them as a ZIP.',
+    lead: 'Every page of your PDF as a separate image.',
+    tool: 'pdf-to-jpg',
+    focus: 'pdf',
+    guideTitle: 'Turning pages into pictures',
+    guide: [
+      'Each page is rendered exactly as your PDF reader would draw it — text, vectors, images and all — and saved as a picture. That makes it easy to drop a page into a slide deck, a chat message or a document that will not accept a PDF.',
+      'Resolution is the one choice that matters. Screen (100 DPI) gives small files that look fine on a phone or monitor. Good (150 DPI) is the sensible default for reading and sharing. Print (300 DPI) is sharp enough to print but produces large files — a 20-page document can easily run to tens of megabytes.',
+      'JPG suits pages with photographs and shading. PNG is lossless and keeps text edges crisp, which is better for diagrams and line art, but the files are considerably bigger. Converting to images also flattens the page: the text in the result is a picture of text, so it can no longer be selected, searched or copied.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'Can I download all the pages at once?',
+        a: 'Yes. Every page gets its own download button, and there is a “Download all as ZIP” button for the whole set.',
+      },
+      {
+        q: 'Will the text still be selectable?',
+        a: 'No. An image is an image. If you need selectable text, keep the PDF — or use Compress PDF, which leaves text intact.',
+      },
+      {
+        q: 'What resolution should I choose?',
+        a: 'Good (150 DPI) for almost everything. Choose Print (300 DPI) only if the images are going to paper, and Screen (100 DPI) if you need the smallest files.',
+      },
+      {
+        q: 'Can it handle a password-protected PDF?',
+        a: 'No. Locked PDFs cannot be opened without the password, and this tool does not attempt to bypass encryption.',
+      },
+    ],
+    related: ['jpg-to-pdf', 'compress-pdf', 'merge-pdf'],
+  },
+  {
+    slug: 'jpg-to-pdf',
+    title: 'Convert JPG to PDF online — free, private, keeps quality',
+    h1: 'Convert JPG to PDF',
+    description:
+      'Turn photos and scans into a single PDF in your browser. Reorder the pages, choose A4, Letter or fit-to-image, and upload nothing.',
+    lead: 'One PDF from your photos, one page per image.',
+    tool: 'jpg-to-pdf',
+    focus: 'image',
+    guideTitle: 'From a pile of photos to one document',
+    guide: [
+      'Every image becomes one page, in the order shown in the list. JPG and PNG files are placed into the PDF exactly as they are, with no re-encoding at all, so a JPG to PDF conversion loses no quality whatsoever and the PDF ends up roughly the size of the photos that went into it. Other formats — HEIC from an iPhone, WebP, AVIF, BMP — are decoded and saved as high-quality JPEG inside the document.',
+      'Page size is up to you. “Fit each image” gives every page the shape of its own picture, which is what you usually want for photos. A4 and US Letter produce a normal paper-sized document with the image centred, optionally with a margin — the right choice when the PDF is going to be printed or uploaded to a form that expects a standard page.',
+      'Order matters, so dropped folders can be put right with Sort A→Z or the up and down arrows before you build the file. This is the usual way to send a set of phone photos of a document as one tidy attachment.',
+    ],
+    faqs: [
+      PRIVACY_FAQ,
+      {
+        q: 'Does it reduce the quality of my photos?',
+        a: 'Not for JPG or PNG. Those files are embedded byte for byte, so the pages look exactly like the originals. Other formats are converted to high-quality JPEG because PDF cannot store them directly.',
+      },
+      {
+        q: 'Can I use HEIC photos from my iPhone?',
+        a: 'Yes. HEIC files are decoded here and added as pages, so you do not need to convert them first.',
+      },
+      {
+        q: 'How do I set the page order?',
+        a: 'Use the up and down arrows on each row, or Sort A→Z to order by file name. The PDF follows the list exactly.',
+      },
+      {
+        q: 'The PDF is quite large. What can I do?',
+        a: 'That is expected, since the photos are stored at full quality. Run the result through Compress PDF to shrink it, or compress the images first.',
+      },
+    ],
+    related: ['pdf-to-jpg', 'merge-pdf', 'compress-pdf'],
   },
 
   // ---------- Task pages ----------
