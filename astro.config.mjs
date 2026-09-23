@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 
 import react from '@astrojs/react';
+import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import cspHashes from './integrations/csp-hashes.mjs';
 import { SITE } from './src/config/site.ts';
@@ -10,7 +11,7 @@ import { SITE } from './src/config/site.ts';
 export default defineConfig({
   site: SITE.url,
   // Must stay last: it hashes the final inline scripts in the built HTML.
-  integrations: [react(), cspHashes()],
+  integrations: [react(), sitemap(), cspHashes()],
   vite: {
     plugins: [tailwindcss()],
   },
