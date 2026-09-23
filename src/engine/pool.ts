@@ -1,6 +1,17 @@
 import * as Comlink from 'comlink';
-import type { WorkerApi } from './worker';
-import type { CompressOptions, CompressResult, DetectedType, EngineId } from './types';
+import type { WorkerApi, WorkerResult } from './worker';
+import type {
+  CompressOptions,
+  CompressResult,
+  DetectedType,
+  EngineId,
+  ImagesToPdfOptions,
+  ImagesToPdfResult,
+  MergeOptions,
+  MergeResult,
+  PdfToImagesOptions,
+  PdfToImagesResult,
+} from './types';
 import { OFFLINE_ENGINE_MESSAGE } from './errors';
 import { UserFacingError } from './types';
 
@@ -45,17 +56,13 @@ export class AbortError extends Error {
 }
 
 /**
- * Runs one compression in a worker. Aborting terminates that worker outright, which is the only
- * way to stop a synchronous WASM encode and immediately frees its memory.
+ * Runs one job in a worker. Aborting terminates that worker outright, which is the only way to
+ * stop a synchronous WASM encode and immediately frees its memory.
  */
-export function runInWorker(
-  engine: EngineId,
-  file: File,
-  type: DetectedType,
-  options: CompressOptions,
-  onProgress: (f: number) => void,
+function callWorker<T>(
+  invoke: (api: Comlink.Remote<WorkerApi>) => Promise<WorkerResult<T>>,
   signal: AbortSignal,
-): Promise<CompressResult> {
+): Promise<T> {
   if (signal.aborted) return Promise.reject(new AbortError());
   const h = acquire();
   return new Promise((resolve, reject) => {
@@ -83,8 +90,7 @@ export function runInWorker(
     signal.addEventListener('abort', onAbort, { once: true });
     h.worker.addEventListener('error', onCrash, { once: true });
 
-    h.api
-      .compress(engine, file, type, options, Comlink.proxy(onProgress))
+    invoke(h.api)
       .then((res) => {
         if (settled) return;
         settled = true;
@@ -106,4 +112,45 @@ export function runInWorker(
         reject(err instanceof Error ? err : new Error(String(err)));
       });
   });
+}
+
+export function runInWorker(
+  engine: EngineId,
+  file: File,
+  type: DetectedType,
+  options: CompressOptions,
+  onProgress: (f: number) => void,
+  signal: AbortSignal,
+): Promise<CompressResult> {
+  return callWorker(
+    (api) => api.compress(engine, file, type, options, Comlink.proxy(onProgress)),
+    signal,
+  );
+}
+
+export function mergeInWorker(
+  files: File[],
+  options: MergeOptions,
+  onProgress: (f: number) => void,
+  signal: AbortSignal,
+): Promise<MergeResult> {
+  return callWorker((api) => api.mergePdf(files, options, Comlink.proxy(onProgress)), signal);
+}
+
+export function pdfToImagesInWorker(
+  file: File,
+  options: PdfToImagesOptions,
+  onProgress: (f: number) => void,
+  signal: AbortSignal,
+): Promise<PdfToImagesResult> {
+  return callWorker((api) => api.pdfToImages(file, options, Comlink.proxy(onProgress)), signal);
+}
+
+export function imagesToPdfInWorker(
+  files: File[],
+  options: ImagesToPdfOptions,
+  onProgress: (f: number) => void,
+  signal: AbortSignal,
+): Promise<ImagesToPdfResult> {
+  return callWorker((api) => api.imagesToPdf(files, options, Comlink.proxy(onProgress)), signal);
 }

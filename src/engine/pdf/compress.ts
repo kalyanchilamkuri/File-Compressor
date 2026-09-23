@@ -3,6 +3,7 @@ import { compressedName } from '../../lib/format';
 import { TARGET_UNREACHABLE_WARNING, stepDownToTarget } from '../targetSize';
 import type { CompressOptions, CompressResult, PdfLevel, ProgressFn } from '../types';
 import { UserFacingError } from '../types';
+import { isEncrypted } from './encrypted';
 import { PdfLockedError } from './pdfjs';
 import { scannedCompress } from './scanned';
 import { smartCompress, type SmartStats } from './smart';
@@ -31,12 +32,6 @@ export interface PdfCompressResult extends CompressResult {
   /** Set when the file looks scanned and "Scanned" mode would likely do much better. */
   suggestScanned?: boolean;
 }
-
-const isEncrypted = (bytes: Uint8Array) => {
-  // The trailer (last few KB) names the encryption dictionary if there is one.
-  const tail = new TextDecoder('latin1').decode(bytes.subarray(Math.max(0, bytes.length - 4096)));
-  return /\/Encrypt\s/.test(tail);
-};
 
 function looksScanned(stats: SmartStats, fileBytes: number) {
   return stats.images >= stats.pages * 0.8 && stats.imageBytes > fileBytes * 0.75;
