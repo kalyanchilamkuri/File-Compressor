@@ -1,13 +1,42 @@
 ---
 import '../styles/global.css';
-import { SITE } from '../config/site';
+import AdSlot from '../components/AdSlot';
+import ConsentBanner from '../components/ConsentBanner';
+import ThemeToggle from '../components/ThemeToggle';
+import { FEATURE_FLAGS, MONETIZATION, SITE } from '../config/site';
 
 interface Props {
   title?: string;
   description?: string;
+  /** Extra JSON-LD objects (FAQPage, BreadcrumbList, …) for this page. */
+  structuredData?: object[];
+  /** Site-relative path of a 1200×630 image. */
+  ogImage?: string;
+  noindex?: boolean;
 }
 
-const { title, description = SITE.description } = Astro.props;
+const NAV = [
+  { href: '/compress-image', label: 'Image' },
+  { href: '/compress-pdf', label: 'PDF' },
+  { href: '/compress-video', label: 'Video' },
+  { href: '/compress-audio', label: 'Audio' },
+  { href: '/zip', label: 'ZIP' },
+];
+
+const FOOTER = [
+  { href: '/privacy', label: 'Privacy' },
+  { href: '/terms', label: 'Terms' },
+  ...(FEATURE_FLAGS.ENABLE_PRO ? [{ href: '/pro', label: 'Pro' }] : []),
+];
+
+const {
+  title,
+  description = SITE.description,
+  structuredData = [],
+  ogImage = '/og/home.jpg',
+  noindex = false,
+} = Astro.props;
+const ogImageURL = new URL(ogImage, Astro.site ?? SITE.url);
 const pageTitle = title
   ? `${title} · ${SITE.name}`
   : `${SITE.name} — compress files privately in your browser`;
@@ -31,8 +60,10 @@ const jsonLd = {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="generator" content={Astro.generator} />
 
     <title>{pageTitle}</title>
@@ -44,12 +75,18 @@ const jsonLd = {
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
-    <!-- Switch to summary_large_image once an og:image exists. -->
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    {noindex && <meta name="robots" content="noindex" />}
 
     <meta name="theme-color" content="#ffffff" />
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}></script>
+    {structuredData.map((data) => (
+      <script type="application/ld+json" set:html={JSON.stringify(data)}></script>
+    ))}
     <!-- Runs before paint to avoid a theme flash. Its hash is added to the CSP at build time. -->
     <script is:inline>
       (function () {
@@ -89,24 +126,96 @@ const jsonLd = {
       Skip to content
     </a>
     <header class="border-b border-slate-200 dark:border-slate-800">
-      <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <a href="/" class="text-lg font-semibold tracking-tight">
+      <div class="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
+        <a href="/" class="flex items-center gap-2 text-lg font-semibold tracking-tight">
+          <img src="/favicon.svg" alt="" width="24" height="24" />
           {SITE.name}
         </a>
-        <slot name="header-actions" />
+        <nav aria-label="Tools" class="hidden md:block">
+          <ul class="flex items-center gap-1 text-sm">
+            {NAV.map((n) => (
+              <li>
+                <a
+                  href={n.href}
+                  aria-current={Astro.url.pathname === n.href ? 'page' : undefined}
+                  class="rounded-full px-3 py-1.5 text-slate-600 hover:bg-slate-100 hover:text-slate-900 aria-[current=page]:bg-slate-100 aria-[current=page]:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white dark:aria-[current=page]:bg-slate-800 dark:aria-[current=page]:text-white"
+                >
+                  {n.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <ThemeToggle client:load />
       </div>
+      <nav aria-label="Tools" class="border-t border-slate-100 md:hidden dark:border-slate-900">
+        <ul class="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-3 py-2 text-sm">
+          {NAV.map((n) => (
+            <li class="shrink-0">
+              <a
+                href={n.href}
+                aria-current={Astro.url.pathname === n.href ? 'page' : undefined}
+                class="inline-block rounded-full px-3 py-2 text-slate-600 aria-[current=page]:bg-slate-100 aria-[current=page]:text-slate-900 dark:text-slate-300 dark:aria-[current=page]:bg-slate-800 dark:aria-[current=page]:text-white"
+              >
+                {n.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
 
-    <main id="main" class="flex-1">
-      <slot />
-    </main>
+    {FEATURE_FLAGS.ENABLE_ADS ? (
+      <div class="mx-auto flex w-full max-w-7xl flex-1 gap-6">
+        <main id="main" class="min-w-0 flex-1">
+          <slot />
+        </main>
+        <div class="hidden w-[300px] shrink-0 pt-10 lg:block">
+          <div class="sticky top-6">
+            <AdSlot client:idle slot="sidebar" />
+          </div>
+        </div>
+      </div>
+    ) : (
+      <main id="main" class="flex-1">
+        <slot />
+      </main>
+    )}
+    {FEATURE_FLAGS.ENABLE_ADS && <ConsentBanner client:idle />}
 
     <footer class="border-t border-slate-200 dark:border-slate-800">
-      <div class="mx-auto max-w-5xl px-4 py-6 text-sm text-slate-600 dark:text-slate-400">
-        <p>
+      <div class="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-8 text-sm text-slate-600 sm:flex-row sm:items-center sm:justify-between dark:text-slate-400">
+        <p class="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300">
           <span aria-hidden="true">🔒</span> Files never leave your device
+          <span aria-hidden="true">•</span> Works offline
         </p>
+        <ul class="flex flex-wrap gap-x-4 gap-y-2">
+          {FOOTER.map((n) => (
+            <li>
+              <a href={n.href} class="hover:text-slate-900 hover:underline dark:hover:text-white">
+                {n.label}
+              </a>
+            </li>
+          ))}
+          {FEATURE_FLAGS.ENABLE_DONATIONS && (
+            <li>
+              <a
+                href={MONETIZATION.donationUrl}
+                rel="noopener noreferrer"
+                target="_blank"
+                class="hover:underline"
+              >
+                Support us
+              </a>
+            </li>
+          )}
+        </ul>
       </div>
     </footer>
+    <script>
+      // Bundled by Astro into an external module, so the CSP needs no extra hash for it.
+      import { registerSW } from 'virtual:pwa-register';
+      registerSW({ immediate: true });
+    </script>
   </body>
 </html>
