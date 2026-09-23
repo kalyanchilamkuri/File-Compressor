@@ -3,7 +3,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
+}
+
+/* Follow the resolved theme (not just the OS) so scrollbars and form controls match. */
+:root.dark {
+  color-scheme: dark;
 }
 
 html,
