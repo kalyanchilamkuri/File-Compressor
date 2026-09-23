@@ -84,6 +84,9 @@ function extraCspSources() {
 // https://astro.build/config
 export default defineConfig({
   site: SITE.url,
+  // The dev-only toolbar sat on top of the drop zone and the results panel. Astro has no way to
+  // hide individual built-in apps, so it is off entirely; `placement` applies if it is re-enabled.
+  devToolbar: { enabled: false, placement: 'bottom-left' },
   // cspHashes must stay last: it hashes the final inline scripts in the built HTML.
   integrations: [
     react(),
