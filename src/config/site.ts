@@ -36,9 +36,18 @@ export const MONETIZATION = {
   adNetwork: {
     scriptUrl: '',
     csp: {
-      script: ['https://pagead2.googlesyndication.com', 'https://googlesyndication.com'] as string[],
-      connect: ['https://pagead2.googlesyndication.com', 'https://googlesyndication.com'] as string[],
-      frame: ['https://googleads.g.doubleclick.net', 'https://tpc.googlesyndication.com'] as string[],
+      script: [
+        'https://pagead2.googlesyndication.com',
+        'https://googlesyndication.com',
+      ] as string[],
+      connect: [
+        'https://pagead2.googlesyndication.com',
+        'https://googlesyndication.com',
+      ] as string[],
+      frame: [
+        'https://googleads.g.doubleclick.net',
+        'https://tpc.googlesyndication.com',
+      ] as string[],
       img: ['https://googlesyndication.com', 'https://googleusercontent.com'] as string[],
     },
   },
