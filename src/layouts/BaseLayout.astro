@@ -150,7 +150,11 @@ const jsonLd = {
         </nav>
         <ThemeToggle client:load />
       </div>
-      <nav aria-label="Tools" class="border-t border-slate-100 md:hidden dark:border-slate-900">
+      <nav
+        aria-label="Tools"
+        class="border-t border-slate-100 md:hidden dark:border-slate-900"
+        style="mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 24px), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 24px), transparent);"
+      >
         <ul class="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-3 py-2 text-sm">
           {NAV.map((n) => (
             <li class="shrink-0">

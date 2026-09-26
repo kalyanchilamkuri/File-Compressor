@@ -27,15 +27,19 @@ export const MONETIZATION = {
   },
   /**
    * The ad network's loader and the origins it needs. Added to the CSP at build time only when
-   * ENABLE_ADS is true. Fill in from your network's CSP documentation.
+   * ENABLE_ADS is true. Pre-filled with Google AdSense's documented origins as a starting point —
+   * still needs `scriptUrl` set to your publisher tag
+   * (`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX`)
+   * once you have an AdSense account. Switching networks means replacing every origin below with
+   * that network's own CSP documentation, not just adding to this list.
    */
   adNetwork: {
     scriptUrl: '',
     csp: {
-      script: [] as string[],
-      connect: [] as string[],
-      frame: [] as string[],
-      img: [] as string[],
+      script: ['https://pagead2.googlesyndication.com', 'https://googlesyndication.com'] as string[],
+      connect: ['https://pagead2.googlesyndication.com', 'https://googlesyndication.com'] as string[],
+      frame: ['https://googleads.g.doubleclick.net', 'https://tpc.googlesyndication.com'] as string[],
+      img: ['https://googlesyndication.com', 'https://googleusercontent.com'] as string[],
     },
   },
   /** One contextual line after results. Off unless ENABLE_AFFILIATE is true. */
